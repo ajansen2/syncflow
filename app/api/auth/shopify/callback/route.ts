@@ -127,19 +127,44 @@ export async function GET(request: NextRequest) {
     console.log('✅ Store ready:', store.id);
 
     // Create/update Shopify channel connection
-    await supabase.from('channel_connections').upsert({
-      store_id: store.id,
-      platform: 'shopify',
-      account_id: shopInfo.id?.toString(),
-      account_name: shopInfo.name,
-      access_token: accessToken,
-      is_active: true,
-      last_sync_at: new Date().toISOString(),
-      sync_status: 'pending',
-      updated_at: new Date().toISOString(),
-    }, {
-      onConflict: 'store_id,platform,marketplace',
-    });
+    const { data: existingConnection } = await supabase
+      .from('channel_connections')
+      .select('id')
+      .eq('store_id', store.id)
+      .eq('platform', 'shopify')
+      .maybeSingle();
+
+    if (existingConnection) {
+      await supabase
+        .from('channel_connections')
+        .update({
+          account_id: shopInfo.id?.toString(),
+          account_name: shopInfo.name,
+          access_token: accessToken,
+          is_active: true,
+          sync_status: 'pending',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existingConnection.id);
+    } else {
+      const { error: connError } = await supabase
+        .from('channel_connections')
+        .insert({
+          store_id: store.id,
+          platform: 'shopify',
+          account_id: shopInfo.id?.toString(),
+          account_name: shopInfo.name,
+          access_token: accessToken,
+          is_active: true,
+          sync_status: 'pending',
+        });
+
+      if (connError) {
+        console.error('Failed to create channel connection:', connError);
+      }
+    }
+
+    console.log('✅ Shopify channel connection ready');
 
     // Register webhooks for order syncing
     const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/shopify`;
