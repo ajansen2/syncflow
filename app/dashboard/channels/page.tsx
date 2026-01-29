@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase-client';
 import { navigateInApp } from '@/lib/shopify-app-bridge';
@@ -22,7 +22,7 @@ interface ChannelConnection {
   sync_status: string;
 }
 
-export default function ChannelsPage() {
+function ChannelsContent() {
   const [loading, setLoading] = useState(true);
   const [store, setStore] = useState<Store | null>(null);
   const [channels, setChannels] = useState<ChannelConnection[]>([]);
@@ -367,5 +367,20 @@ export default function ChannelsPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function ChannelsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-solid border-cyan-500 border-r-transparent mb-4"></div>
+          <div className="text-white text-xl">Loading channels...</div>
+        </div>
+      </div>
+    }>
+      <ChannelsContent />
+    </Suspense>
   );
 }
