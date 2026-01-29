@@ -61,10 +61,13 @@ export async function GET(request: NextRequest) {
 
     const results: { store_id: string; success: boolean; error?: string }[] = [];
 
+    // Get base URL from request or environment
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+
     for (const store of storesToSync) {
       try {
         // Call the sync endpoint internally
-        const syncResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/sync/orders`, {
+        const syncResponse = await fetch(`${baseUrl}/api/sync/orders`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -73,13 +76,20 @@ export async function GET(request: NextRequest) {
           }),
         });
 
+        const responseText = await syncResponse.text();
+        let responseData;
+        try {
+          responseData = JSON.parse(responseText);
+        } catch {
+          responseData = { error: responseText || 'Empty response' };
+        }
+
         if (syncResponse.ok) {
           results.push({ store_id: store.id, success: true });
           console.log(`[Cron] Synced store ${store.shop_domain}`);
         } else {
-          const errorData = await syncResponse.json();
-          results.push({ store_id: store.id, success: false, error: errorData.error });
-          console.error(`[Cron] Failed to sync ${store.shop_domain}:`, errorData.error);
+          results.push({ store_id: store.id, success: false, error: responseData.error || 'Unknown error' });
+          console.error(`[Cron] Failed to sync ${store.shop_domain}:`, responseData.error);
         }
       } catch (err: any) {
         results.push({ store_id: store.id, success: false, error: err.message });
