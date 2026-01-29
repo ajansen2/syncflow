@@ -812,7 +812,7 @@ export default function HomePage() {
             <div style={{ display: 'flex', gap: '30px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '30px' }}>
               <a href="/privacy" style={{ color: '#666', textDecoration: 'none' }}>Privacy Policy</a>
               <a href="/terms" style={{ color: '#666', textDecoration: 'none' }}>Terms of Service</a>
-              <a href="mailto:support@syncflow.app" style={{ color: '#666', textDecoration: 'none' }}>Contact</a>
+              <a href="mailto:adam@argora.ai" style={{ color: '#666', textDecoration: 'none' }}>Contact</a>
             </div>
             <div style={{ color: '#666' }}>
               © 2025 SyncFlow - Multi-Channel Order Sync for Shopify

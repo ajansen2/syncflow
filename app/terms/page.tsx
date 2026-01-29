@@ -275,7 +275,7 @@ export default function TermsPage() {
 
             <h3 className="text-xl font-bold text-white mb-3 mt-6">Informal Resolution</h3>
             <p className="mb-4">
-              Before filing a claim, you agree to contact us at <a href="mailto:support@syncflow.ca" className="text-cyan-400 hover:text-cyan-300">support@syncflow.ca</a> to attempt to resolve the dispute informally.
+              Before filing a claim, you agree to contact us at <a href="mailto:adam@argora.ai" className="text-cyan-400 hover:text-cyan-300">adam@argora.ai</a> to attempt to resolve the dispute informally.
             </p>
 
             <h3 className="text-xl font-bold text-white mb-3 mt-6">Binding Arbitration</h3>
@@ -328,7 +328,7 @@ export default function TermsPage() {
             <p className="mb-4">If you have questions about these Terms, please contact us:</p>
             <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-xl p-6">
               <p className="text-white"><strong>SyncFlow</strong></p>
-              <p className="mt-2">Email: <a href="mailto:support@syncflow.ca" className="text-cyan-400 hover:text-cyan-300">support@syncflow.ca</a></p>
+              <p className="mt-2">Email: <a href="mailto:adam@argora.ai" className="text-cyan-400 hover:text-cyan-300">adam@argora.ai</a></p>
               <p>Legal: <a href="mailto:legal@syncflow.ca" className="text-cyan-400 hover:text-cyan-300">legal@syncflow.ca</a></p>
             </div>
           </section>
@@ -386,7 +386,7 @@ export default function TermsPage() {
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Contact</h4>
-              <p className="text-white/60">support@syncflow.app</p>
+              <p className="text-white/60">adam@argora.ai</p>
             </div>
           </div>
           <div className="border-t border-white/10 pt-8 text-center text-white/60">

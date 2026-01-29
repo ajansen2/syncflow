@@ -250,7 +250,7 @@ export default function PrivacyPage() {
             <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-xl p-6">
               <p className="text-white"><strong>SyncFlow</strong></p>
               <p className="mt-2">Email: <a href="mailto:privacy@syncflow.ca" className="text-cyan-400 hover:text-cyan-300">privacy@syncflow.ca</a></p>
-              <p>Support: <a href="mailto:support@syncflow.app" className="text-cyan-400 hover:text-cyan-300">support@syncflow.app</a></p>
+              <p>Support: <a href="mailto:adam@argora.ai" className="text-cyan-400 hover:text-cyan-300">adam@argora.ai</a></p>
             </div>
           </section>
         </div>
@@ -307,7 +307,7 @@ export default function PrivacyPage() {
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Contact</h4>
-              <p className="text-white/60">support@syncflow.app</p>
+              <p className="text-white/60">adam@argora.ai</p>
             </div>
           </div>
           <div className="border-t border-white/10 pt-8 text-center text-white/60">

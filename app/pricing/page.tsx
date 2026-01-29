@@ -135,7 +135,7 @@ export default function PricingPage() {
 
         {/* Footer */}
         <div className="text-center mt-12 text-white/40 text-sm">
-          <p>Questions? Contact us at <a href="mailto:support@syncflow.app" className="text-cyan-400 hover:underline">support@syncflow.app</a></p>
+          <p>Questions? Contact us at <a href="mailto:adam@argora.ai" className="text-cyan-400 hover:underline">adam@argora.ai</a></p>
         </div>
       </div>
     </div>
