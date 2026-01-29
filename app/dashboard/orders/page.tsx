@@ -123,6 +123,34 @@ function OrdersContent() {
   const paginatedOrders = filteredOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
 
+  const exportToCSV = () => {
+    if (filteredOrders.length === 0) return;
+
+    const headers = ['Order Number', 'Customer Email', 'Total', 'Currency', 'Platform', 'UTM Source', 'UTM Medium', 'UTM Campaign', 'Order Date'];
+    const rows = filteredOrders.map(order => [
+      order.order_number,
+      order.customer_email || '',
+      order.total_price.toFixed(2),
+      order.currency,
+      order.attributed_platform || 'Direct',
+      order.utm_source || '',
+      order.utm_medium || '',
+      order.utm_campaign || '',
+      new Date(order.order_created_at).toLocaleDateString()
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `syncflow-orders-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900">
       {/* Sidebar - same as dashboard */}
@@ -159,13 +187,13 @@ function OrdersContent() {
             </button>
 
             <button
-              onClick={() => navigateInApp('/dashboard/campaigns')}
+              onClick={() => navigateInApp('/dashboard/channels')}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:bg-white/5 hover:text-white transition cursor-pointer"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
               </svg>
-              <span className="font-medium">Campaigns</span>
+              <span className="font-medium">Channels</span>
             </button>
 
             <button
@@ -186,8 +214,18 @@ function OrdersContent() {
       <main className="lg:ml-64 min-h-screen">
         {/* Header */}
         <header className="bg-slate-900/50 backdrop-blur border-b border-white/10 sticky top-0 z-30">
-          <div className="px-6 py-4">
+          <div className="px-6 py-4 flex justify-between items-center">
             <h1 className="text-2xl font-bold text-white">Orders</h1>
+            <button
+              onClick={exportToCSV}
+              disabled={filteredOrders.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Export CSV
+            </button>
           </div>
         </header>
 
