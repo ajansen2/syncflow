@@ -29,7 +29,6 @@ export async function logActivity(
 
     const { error } = await supabase
       .from('activities')
-      // @ts-expect-error - Singleton pattern causes type inference issues
       .insert({
         user_id: session.user.id,
         action,
