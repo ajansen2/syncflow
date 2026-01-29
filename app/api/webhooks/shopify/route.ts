@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Get the most recent active store for this shop domain (AdWyse uses shop_domain)
+    // Get the most recent active store for this shop domain (SyncFlow uses shop_domain)
     // (handles duplicate stores by using the latest one)
     const { data: stores } = await supabase
       .from('stores')

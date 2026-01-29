@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900">
       <style jsx global>{`
         @keyframes gradient {
           0% { background-position: 0% 50%; }
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
       <header className="border-b border-white/10 backdrop-blur-md bg-slate-900/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link href="/" style={{ cursor: 'pointer', fontSize: '24px', fontWeight: 800 }}>
-            <span className="gradient-text">AdWyse</span>
+            <span className="gradient-text">SyncFlow</span>
           </Link>
           <nav className="flex gap-8">
             <Link href="/" className="text-white/80 hover:text-white transition-colors">Home</Link>
@@ -56,10 +56,10 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-3xl font-bold text-white mb-4">Introduction</h2>
             <p className="mb-4">
-              Welcome to AdWyse. We are committed to protecting your privacy and ensuring the security of your personal and business information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our ad attribution service for Shopify stores.
+              Welcome to SyncFlow. We are committed to protecting your privacy and ensuring the security of your personal and business information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our ad attribution service for Shopify stores.
             </p>
             <p>
-              By using AdWyse, you agree to the collection and use of information in accordance with this policy. If you do not agree with our policies and practices, please do not use our services.
+              By using SyncFlow, you agree to the collection and use of information in accordance with this policy. If you do not agree with our policies and practices, please do not use our services.
             </p>
           </section>
 
@@ -186,7 +186,7 @@ export default function PrivacyPage() {
               <li><strong className="text-white">Object:</strong> Object to certain data processing activities</li>
             </ul>
             <p className="mt-4">
-              To exercise these rights, contact us at <a href="mailto:privacy@adwyse.ca" className="text-orange-400 hover:text-orange-300">privacy@adwyse.ca</a>.
+              To exercise these rights, contact us at <a href="mailto:privacy@syncflow.ca" className="text-cyan-400 hover:text-cyan-300">privacy@syncflow.ca</a>.
             </p>
           </section>
 
@@ -212,10 +212,10 @@ export default function PrivacyPage() {
               Our platform integrates with third-party services (Shopify, Facebook Ads, Google Ads, Anthropic) that have their own privacy policies. We encourage you to review their policies:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4 mt-4">
-              <li><a href="https://www.shopify.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300">Shopify Privacy Policy</a></li>
-              <li><a href="https://www.facebook.com/privacy/explanation" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300">Facebook Privacy Policy</a></li>
-              <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300">Google Privacy Policy</a></li>
-              <li><a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300">Anthropic Privacy Policy</a></li>
+              <li><a href="https://www.shopify.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300">Shopify Privacy Policy</a></li>
+              <li><a href="https://www.facebook.com/privacy/explanation" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300">Facebook Privacy Policy</a></li>
+              <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300">Google Privacy Policy</a></li>
+              <li><a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-cyan-300">Anthropic Privacy Policy</a></li>
             </ul>
           </section>
 
@@ -223,7 +223,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-3xl font-bold text-white mb-4">Children's Privacy</h2>
             <p>
-              AdWyse is not intended for users under 18 years of age. We do not knowingly collect information from children. If you believe we have collected information from a child, please contact us immediately.
+              SyncFlow is not intended for users under 18 years of age. We do not knowingly collect information from children. If you believe we have collected information from a child, please contact us immediately.
             </p>
           </section>
 
@@ -247,10 +247,10 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-3xl font-bold text-white mb-4">Contact Us</h2>
             <p className="mb-4">If you have questions or concerns about this Privacy Policy, please contact us:</p>
-            <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-xl p-6">
-              <p className="text-white"><strong>AdWyse</strong></p>
-              <p className="mt-2">Email: <a href="mailto:privacy@adwyse.ca" className="text-orange-400 hover:text-orange-300">privacy@adwyse.ca</a></p>
-              <p>Support: <a href="mailto:adam@adwyse.ca" className="text-orange-400 hover:text-orange-300">adam@adwyse.ca</a></p>
+            <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+              <p className="text-white"><strong>SyncFlow</strong></p>
+              <p className="mt-2">Email: <a href="mailto:privacy@syncflow.ca" className="text-cyan-400 hover:text-cyan-300">privacy@syncflow.ca</a></p>
+              <p>Support: <a href="mailto:support@syncflow.app" className="text-cyan-400 hover:text-cyan-300">support@syncflow.app</a></p>
             </div>
           </section>
         </div>
@@ -287,7 +287,7 @@ export default function PrivacyPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="text-2xl font-bold gradient-text mb-4">AdWyse</div>
+              <div className="text-2xl font-bold gradient-text mb-4">SyncFlow</div>
               <p className="text-white/60">AI-powered ad attribution for Shopify</p>
             </div>
             <div>
@@ -307,11 +307,11 @@ export default function PrivacyPage() {
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Contact</h4>
-              <p className="text-white/60">adam@adwyse.ca</p>
+              <p className="text-white/60">support@syncflow.app</p>
             </div>
           </div>
           <div className="border-t border-white/10 pt-8 text-center text-white/60">
-            <p>&copy; 2025 AdWyse. All rights reserved.</p>
+            <p>&copy; 2025 SyncFlow. All rights reserved.</p>
           </div>
         </div>
       </footer>

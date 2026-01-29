@@ -21,11 +21,11 @@ interface AlertData {
 export function generateAlertEmail(data: AlertData): string {
   const shopName = data.shopDomain?.replace('.myshopify.com', '') || '';
   const dashboardUrl = shopName
-    ? `https://admin.shopify.com/store/${shopName}/apps/adwyse/dashboard`
-    : 'https://adwyse.ca/dashboard';
+    ? `https://admin.shopify.com/store/${shopName}/apps/syncflow/dashboard`
+    : 'https://syncflow.ca/dashboard';
   const settingsUrl = shopName
-    ? `https://admin.shopify.com/store/${shopName}/apps/adwyse/dashboard/settings`
-    : 'https://adwyse.ca/dashboard/settings';
+    ? `https://admin.shopify.com/store/${shopName}/apps/syncflow/dashboard/settings`
+    : 'https://syncflow.ca/dashboard/settings';
 
   const isLowRoas = data.alertType === 'low_roas';
   const alertColor = isLowRoas ? '#ef4444' : '#f59e0b';
@@ -41,7 +41,7 @@ export function generateAlertEmail(data: AlertData): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AdWyse Performance Alert</title>
+  <title>SyncFlow Performance Alert</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #1a1a2e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #1a1a2e; padding: 40px 20px;">
@@ -96,7 +96,7 @@ export function generateAlertEmail(data: AlertData): string {
           <tr>
             <td style="padding: 20px 30px; background-color: rgba(0,0,0,0.2); text-align: center;">
               <p style="color: rgba(255,255,255,0.4); margin: 0; font-size: 12px;">
-                You're receiving this because you enabled performance alerts in AdWyse.
+                You're receiving this because you enabled performance alerts in SyncFlow.
                 <br>
                 <a href="${settingsUrl}" style="color: #f97316;">Manage alert settings</a>
               </p>
@@ -134,7 +134,7 @@ export async function sendAlertEmail(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'AdWyse Alerts <alerts@send.adwyse.ca>',
+        from: 'SyncFlow Alerts <alerts@send.syncflow.ca>',
         to: [to],
         subject: subject,
         html: html,

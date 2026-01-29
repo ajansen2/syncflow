@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     // Get campaigns for this store, aggregated by campaign name
     // Since campaigns table stores daily data, we need to aggregate
     const { data: campaigns, error: campaignsError } = await supabase
-      .from('adwyse_campaigns')
+      .from('syncflow_campaigns')
       .select('*')
       .eq('store_id', merchantId)
       .order('date', { ascending: false });

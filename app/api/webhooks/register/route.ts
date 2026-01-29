@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Store not found' }, { status: 404 });
     }
 
-    // Extract shop domain from store (AdWyse uses shop_domain column)
+    // Extract shop domain from store (SyncFlow uses shop_domain column)
     const shop = store.shop_domain;
     const ordersWebhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/shopify/orders`;
 

@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900">
       <style jsx global>{`
         @keyframes gradient {
           0% { background-position: 0% 50%; }
@@ -34,7 +34,7 @@ export default function TermsPage() {
       <header className="border-b border-white/10 backdrop-blur-md bg-slate-900/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link href="/" style={{ cursor: 'pointer', fontSize: '24px', fontWeight: 800 }}>
-            <span className="gradient-text">AdWyse</span>
+            <span className="gradient-text">SyncFlow</span>
           </Link>
           <nav className="flex gap-8">
             <Link href="/" className="text-white/80 hover:text-white transition-colors">Home</Link>
@@ -56,7 +56,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-3xl font-bold text-white mb-4">1. Agreement to Terms</h2>
             <p className="mb-4">
-              These Terms of Service ("Terms") constitute a legally binding agreement between you and AdWyse ("we," "us," "our") concerning your access to and use of our ad attribution service for Shopify stores (collectively, the "Services").
+              These Terms of Service ("Terms") constitute a legally binding agreement between you and SyncFlow ("we," "us," "our") concerning your access to and use of our ad attribution service for Shopify stores (collectively, the "Services").
             </p>
             <p className="mb-4">
               By accessing or using our Services, you agree to be bound by these Terms and our Privacy Policy. If you do not agree to these Terms, you may not access or use the Services.
@@ -106,7 +106,7 @@ export default function TermsPage() {
             <h2 className="text-3xl font-bold text-white mb-4">4. Subscription and Billing</h2>
 
             <h3 className="text-xl font-bold text-white mb-3 mt-6">Subscription Plans</h3>
-            <p className="mb-4">AdWyse offers a Pro Plan subscription:</p>
+            <p className="mb-4">SyncFlow offers a Pro Plan subscription:</p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li><strong className="text-white">Pro Plan ($99/month):</strong> AI-powered ad attribution tracking, unlimited order tracking, Facebook/Google Ads integration, ROAS calculations, AI insights dashboard, and campaign analytics</li>
               <li><strong className="text-white">7-Day Free Trial:</strong> All new accounts receive a 7-day free trial with full access to Pro features</li>
@@ -152,7 +152,7 @@ export default function TermsPage() {
 
             <h3 className="text-xl font-bold text-white mb-3 mt-6">Our Content</h3>
             <p className="mb-4">
-              The Services, including all software, text, graphics, logos, and other content, are owned by AdWyse or our licensors and are protected by copyright, trademark, and other intellectual property laws.
+              The Services, including all software, text, graphics, logos, and other content, are owned by SyncFlow or our licensors and are protected by copyright, trademark, and other intellectual property laws.
             </p>
             <p className="mb-4">
               We grant you a limited, non-exclusive, non-transferable license to access and use the Services for your business purposes. You may not copy, modify, distribute, or create derivative works without our written permission.
@@ -195,8 +195,8 @@ export default function TermsPage() {
             <h2 className="text-3xl font-bold text-white mb-4">8. Disclaimers and Limitations of Liability</h2>
 
             <h3 className="text-xl font-bold text-white mb-3 mt-6">Service Limitations</h3>
-            <p className="mb-4 bg-gradient-to-br from-red-600/20 to-orange-600/20 backdrop-blur-sm border border-red-500/30 rounded-xl p-6">
-              <strong className="text-white">IMPORTANT:</strong> AdWyse provides ad attribution tracking and ROAS calculations. We do NOT guarantee specific ROAS results, ad performance, or revenue outcomes. Campaign performance depends on many factors outside our control including ad creative, targeting, product market fit, pricing, and external market conditions.
+            <p className="mb-4 bg-gradient-to-br from-red-600/20 to-cyan-600/20 backdrop-blur-sm border border-red-500/30 rounded-xl p-6">
+              <strong className="text-white">IMPORTANT:</strong> SyncFlow provides ad attribution tracking and ROAS calculations. We do NOT guarantee specific ROAS results, ad performance, or revenue outcomes. Campaign performance depends on many factors outside our control including ad creative, targeting, product market fit, pricing, and external market conditions.
             </p>
             <p className="mb-4">
               When using our Services, you should:
@@ -242,7 +242,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-3xl font-bold text-white mb-4">9. Indemnification</h2>
             <p>
-              You agree to indemnify, defend, and hold harmless AdWyse and its officers, directors, employees, and agents from any claims, liabilities, damages, losses, or expenses (including attorney's fees) arising from:
+              You agree to indemnify, defend, and hold harmless SyncFlow and its officers, directors, employees, and agents from any claims, liabilities, damages, losses, or expenses (including attorney's fees) arising from:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4 mt-4">
               <li>Your use of the Services</li>
@@ -275,7 +275,7 @@ export default function TermsPage() {
 
             <h3 className="text-xl font-bold text-white mb-3 mt-6">Informal Resolution</h3>
             <p className="mb-4">
-              Before filing a claim, you agree to contact us at <a href="mailto:support@adwyse.ca" className="text-orange-400 hover:text-orange-300">support@adwyse.ca</a> to attempt to resolve the dispute informally.
+              Before filing a claim, you agree to contact us at <a href="mailto:support@syncflow.ca" className="text-cyan-400 hover:text-cyan-300">support@syncflow.ca</a> to attempt to resolve the dispute informally.
             </p>
 
             <h3 className="text-xl font-bold text-white mb-3 mt-6">Binding Arbitration</h3>
@@ -303,7 +303,7 @@ export default function TermsPage() {
 
             <h3 className="text-xl font-bold text-white mb-3 mt-6">Entire Agreement</h3>
             <p>
-              These Terms, together with our Privacy Policy, constitute the entire agreement between you and AdWyse regarding the Services.
+              These Terms, together with our Privacy Policy, constitute the entire agreement between you and SyncFlow regarding the Services.
             </p>
 
             <h3 className="text-xl font-bold text-white mb-3 mt-6">Severability</h3>
@@ -326,10 +326,10 @@ export default function TermsPage() {
           <section>
             <h2 className="text-3xl font-bold text-white mb-4">14. Contact Information</h2>
             <p className="mb-4">If you have questions about these Terms, please contact us:</p>
-            <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-xl p-6">
-              <p className="text-white"><strong>AdWyse</strong></p>
-              <p className="mt-2">Email: <a href="mailto:support@adwyse.ca" className="text-orange-400 hover:text-orange-300">support@adwyse.ca</a></p>
-              <p>Legal: <a href="mailto:legal@adwyse.ca" className="text-orange-400 hover:text-orange-300">legal@adwyse.ca</a></p>
+            <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+              <p className="text-white"><strong>SyncFlow</strong></p>
+              <p className="mt-2">Email: <a href="mailto:support@syncflow.ca" className="text-cyan-400 hover:text-cyan-300">support@syncflow.ca</a></p>
+              <p>Legal: <a href="mailto:legal@syncflow.ca" className="text-cyan-400 hover:text-cyan-300">legal@syncflow.ca</a></p>
             </div>
           </section>
         </div>
@@ -366,7 +366,7 @@ export default function TermsPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="text-2xl font-bold gradient-text mb-4">AdWyse</div>
+              <div className="text-2xl font-bold gradient-text mb-4">SyncFlow</div>
               <p className="text-white/60">AI-powered ad attribution for Shopify</p>
             </div>
             <div>
@@ -386,11 +386,11 @@ export default function TermsPage() {
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Contact</h4>
-              <p className="text-white/60">adam@adwyse.ca</p>
+              <p className="text-white/60">support@syncflow.app</p>
             </div>
           </div>
           <div className="border-t border-white/10 pt-8 text-center text-white/60">
-            <p>&copy; 2025 AdWyse. All rights reserved.</p>
+            <p>&copy; 2025 SyncFlow. All rights reserved.</p>
           </div>
         </div>
       </footer>

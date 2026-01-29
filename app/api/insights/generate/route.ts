@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     // Get store info
     console.log('🤖 [AI Insights] Fetching store...');
     const { data: store } = await supabase
-      .from('adwyse_stores')
+      .from('syncflow_stores')
       .select('*')
       .eq('id', storeId)
       .single();
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     // Get campaigns with performance data (use correct table)
     console.log('🤖 [AI Insights] Fetching campaigns...');
     const { data: campaigns } = await supabase
-      .from('adwyse_campaigns')
+      .from('syncflow_campaigns')
       .select('*')
       .eq('store_id', storeId)
       .order('spend', { ascending: false })
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     // Get recent orders
     console.log('🤖 [AI Insights] Fetching orders...');
     const { data: orders } = await supabase
-      .from('adwyse_orders')
+      .from('syncflow_orders')
       .select('*')
       .eq('store_id', storeId)
       .order('created_at', { ascending: false })
@@ -166,7 +166,7 @@ Keep the analysis concise, actionable, and focused on ROI improvement. Use bulle
     // Save insights to database
     console.log('🤖 [AI Insights] Saving to database...');
     const { data: insight, error: insertError } = await supabase
-      .from('adwyse_insights')
+      .from('syncflow_insights')
       .insert({
         store_id: storeId,
         insight_type: 'campaign_performance',

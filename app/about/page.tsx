@@ -20,7 +20,7 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900">
       <style jsx global>{`
         @keyframes gradient {
           0% { background-position: 0% 50%; }
@@ -59,7 +59,7 @@ export default function AboutPage() {
       <header className="border-b border-white/10 backdrop-blur-md bg-slate-900/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link href="/" style={{ cursor: 'pointer', fontSize: '24px', fontWeight: 800 }}>
-            <span className="gradient-text">AdWyse</span>
+            <span className="gradient-text">SyncFlow</span>
           </Link>
           <nav className="flex gap-8">
             <Link href="/" className="text-white/80 hover:text-white transition-colors">Home</Link>
@@ -72,14 +72,14 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="relative py-24 overflow-hidden">
         <div ref={parallaxRef} className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-500 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-red-500 rounded-full blur-3xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
             <h1 className="text-6xl font-bold text-white mb-6">
-              About <span className="gradient-text">AdWyse</span>
+              About <span className="gradient-text">SyncFlow</span>
             </h1>
             <p className="text-xl text-white/70 max-w-3xl mx-auto">
               AI-powered ad attribution that helps Shopify merchants know exactly which ads make them money
@@ -91,7 +91,7 @@ export default function AboutPage() {
       {/* The Problem */}
       <section className="py-20 relative">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-12 mb-20">
+          <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-12 mb-20">
             <h2 className="text-4xl font-bold text-white mb-6 text-center">The Problem We Solve</h2>
             <div className="grid md:grid-cols-3 gap-8">
               <div>
@@ -121,13 +121,13 @@ export default function AboutPage() {
           {/* Adam's Story */}
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="relative">
-              <div className="bg-gradient-to-br from-orange-600/20 to-red-600/20 backdrop-blur-sm border border-white/10 rounded-2xl p-2">
+              <div className="bg-gradient-to-br from-cyan-600/20 to-red-600/20 backdrop-blur-sm border border-white/10 rounded-2xl p-2">
                 <div className="bg-slate-800/50 rounded-xl p-12 text-center">
                   <div className="w-48 h-48 rounded-full mx-auto mb-6 overflow-hidden">
                     <Image src="/profile2.png" alt="Adam - Founder" width={192} height={192} style={{ objectFit: 'cover' }} />
                   </div>
                   <h3 className="text-2xl font-bold text-white mb-2">Adam</h3>
-                  <p className="text-orange-400 mb-4">Founder</p>
+                  <p className="text-cyan-400 mb-4">Founder</p>
                   <div className="flex justify-center gap-4">
                     <a href="#" className="text-white/60 hover:text-white transition-colors">
                       <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -140,9 +140,9 @@ export default function AboutPage() {
             </div>
 
             <div>
-              <h2 className="text-4xl font-bold text-white mb-6">Why I Built AdWyse</h2>
+              <h2 className="text-4xl font-bold text-white mb-6">Why I Built SyncFlow</h2>
               <p className="text-lg text-white/70 mb-4">
-                Hi, I'm Adam. I built AdWyse to solve the biggest problem in e-commerce advertising: broken attribution tracking.
+                Hi, I'm Adam. I built SyncFlow to solve the biggest problem in e-commerce advertising: broken attribution tracking.
               </p>
               <p className="text-lg text-white/70 mb-4">
                 After iOS 14, Facebook and Google's tracking became unreliable. Merchants started spending thousands on ads without knowing which ones actually drove sales. I watched businesses waste 30-40% of their ad budgets on campaigns that didn't work.
@@ -151,19 +151,19 @@ export default function AboutPage() {
                 Existing solutions like Triple Whale ($129-599/month) and Polar Analytics ($199-599/month) are too expensive and complex. Most Shopify merchants spending $1k-50k/month on ads can't justify those prices.
               </p>
               <p className="text-lg text-white/70">
-                AdWyse tracks every order back to its source using UTM parameters and platform click IDs. But we don't just show data - Claude AI analyzes it and tells you exactly what to do: "Pause this campaign (losing $47/day)" or "Scale this one (5.2x ROAS)." All for $99/month.
+                SyncFlow tracks every order back to its source using UTM parameters and platform click IDs. But we don't just show data - Claude AI analyzes it and tells you exactly what to do: "Pause this campaign (losing $47/day)" or "Scale this one (5.2x ROAS)." All for $99/month.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How AdWyse Works */}
-      <section className="py-20 relative bg-gradient-to-b from-transparent via-orange-900/10 to-transparent">
+      {/* How SyncFlow Works */}
+      <section className="py-20 relative bg-gradient-to-b from-transparent via-cyan-900/10 to-transparent">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-6">
-              How <span className="gradient-text">AdWyse</span> Works
+              How <span className="gradient-text">SyncFlow</span> Works
             </h2>
             <p className="text-xl text-white/70 max-w-3xl mx-auto">
               Built with cutting-edge attribution technology and AI-powered insights
@@ -172,8 +172,8 @@ export default function AboutPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Card 1 */}
-            <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center mb-6">
+            <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-cyan-500/50 transition-all">
+              <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -185,8 +185,8 @@ export default function AboutPage() {
             </div>
 
             {/* Card 2 */}
-            <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center mb-6">
+            <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-cyan-500/50 transition-all">
+              <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
@@ -198,8 +198,8 @@ export default function AboutPage() {
             </div>
 
             {/* Card 3 */}
-            <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl flex items-center justify-center mb-6">
+            <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-cyan-500/50 transition-all">
+              <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
@@ -216,7 +216,7 @@ export default function AboutPage() {
       {/* Why Now? */}
       <section className="py-20 relative">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-12">
+          <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-12">
             <h2 className="text-4xl font-bold text-white mb-6 text-center">Simple Pricing, Powerful Results</h2>
             <p className="text-xl text-white/70 mb-8 text-center max-w-3xl mx-auto">
               One price, unlimited tracking. Get the attribution insights you need without breaking the bank.
@@ -308,7 +308,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="text-2xl font-bold gradient-text mb-4">AdWyse</div>
+              <div className="text-2xl font-bold gradient-text mb-4">SyncFlow</div>
               <p className="text-white/60">AI-powered ad attribution for Shopify</p>
             </div>
             <div>
@@ -328,11 +328,11 @@ export default function AboutPage() {
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Contact</h4>
-              <p className="text-white/60">adam@adwyse.ca</p>
+              <p className="text-white/60">support@syncflow.app</p>
             </div>
           </div>
           <div className="border-t border-white/10 pt-8 text-center text-white/60">
-            <p>&copy; 2025 AdWyse. All rights reserved.</p>
+            <p>&copy; 2025 SyncFlow. All rights reserved.</p>
           </div>
         </div>
       </footer>

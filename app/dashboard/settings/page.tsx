@@ -230,7 +230,7 @@ function SettingsContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: store.email || 'adam@adwyse.ca',
+          email: store.email || 'support@syncflow.app',
           storeName: store.store_name,
           shopDomain: store.shop_domain
         }),
@@ -267,7 +267,7 @@ function SettingsContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: store.email || 'adam@adwyse.ca',
+          email: store.email || 'support@syncflow.app',
           storeName: store.store_name,
           shopDomain: store.shop_domain,
           alertType
@@ -541,9 +541,9 @@ function SettingsContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-solid border-orange-500 border-r-transparent mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-solid border-cyan-500 border-r-transparent mb-4"></div>
           <div className="text-white text-xl">Loading settings...</div>
         </div>
       </div>
@@ -551,15 +551,15 @@ function SettingsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900">
       {/* Sidebar */}
       <aside className="fixed top-0 left-0 z-50 h-screen w-64 bg-slate-900/90 backdrop-blur border-r border-white/10 hidden lg:block">
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-white/10">
             <Link href="/" className="flex items-center gap-3">
-              <img src="/logo.png" alt="AdWyse" className="w-10 h-10" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                AdWyse
+              <img src="/logo.png" alt="SyncFlow" className="w-10 h-10" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
+                SyncFlow
               </span>
             </Link>
           </div>
@@ -597,7 +597,7 @@ function SettingsContent() {
 
             <button
               onClick={() => navigateInApp('/dashboard/settings')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-orange-600/20 text-orange-300 border border-orange-500/30 transition"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 transition"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -707,7 +707,7 @@ function SettingsContent() {
                       <button
                         onClick={handleSyncFacebook}
                         disabled={syncing}
-                        className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-orange-800 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-2"
+                        className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-800 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-2"
                       >
                         {syncing ? (
                           <>
@@ -775,7 +775,7 @@ function SettingsContent() {
                       <button
                         onClick={handleSyncGoogle}
                         disabled={syncingGoogle}
-                        className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-orange-800 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-2"
+                        className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-800 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-2"
                       >
                         {syncingGoogle ? (
                           <>
@@ -843,7 +843,7 @@ function SettingsContent() {
                       <button
                         onClick={handleSyncTikTok}
                         disabled={syncingTikTok}
-                        className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-orange-800 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-2"
+                        className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-800 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-2"
                       >
                         {syncingTikTok ? (
                           <>
@@ -910,7 +910,7 @@ function SettingsContent() {
                 disabled={savingEmailSettings}
                 className={`p-4 rounded-lg border-2 transition ${
                   emailReportFrequency === 'none'
-                    ? 'bg-orange-600/20 border-orange-500 text-white'
+                    ? 'bg-cyan-600/20 border-cyan-500 text-white'
                     : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white'
                 }`}
               >
@@ -923,7 +923,7 @@ function SettingsContent() {
                 disabled={savingEmailSettings}
                 className={`p-4 rounded-lg border-2 transition ${
                   emailReportFrequency === 'weekly'
-                    ? 'bg-orange-600/20 border-orange-500 text-white'
+                    ? 'bg-cyan-600/20 border-cyan-500 text-white'
                     : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white'
                 }`}
               >
@@ -936,7 +936,7 @@ function SettingsContent() {
                 disabled={savingEmailSettings}
                 className={`p-4 rounded-lg border-2 transition ${
                   emailReportFrequency === 'monthly'
-                    ? 'bg-orange-600/20 border-orange-500 text-white'
+                    ? 'bg-cyan-600/20 border-cyan-500 text-white'
                     : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white'
                 }`}
               >
@@ -947,7 +947,7 @@ function SettingsContent() {
 
             {savingEmailSettings && (
               <div className="mt-3 text-white/60 text-sm flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
                 Saving...
               </div>
             )}
@@ -1009,7 +1009,7 @@ function SettingsContent() {
                   <button
                     onClick={() => setRoasAlertEnabled(!roasAlertEnabled)}
                     className={`w-12 h-6 rounded-full transition-colors ${
-                      roasAlertEnabled ? 'bg-orange-600' : 'bg-white/20'
+                      roasAlertEnabled ? 'bg-cyan-600' : 'bg-white/20'
                     }`}
                   >
                     <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
@@ -1043,7 +1043,7 @@ function SettingsContent() {
                   <button
                     onClick={() => setSpendAlertEnabled(!spendAlertEnabled)}
                     className={`w-12 h-6 rounded-full transition-colors ${
-                      spendAlertEnabled ? 'bg-orange-600' : 'bg-white/20'
+                      spendAlertEnabled ? 'bg-cyan-600' : 'bg-white/20'
                     }`}
                   >
                     <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
@@ -1070,7 +1070,7 @@ function SettingsContent() {
               <button
                 onClick={handleSaveAlertSettings}
                 disabled={savingAlertSettings}
-                className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-orange-800 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-2"
+                className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-cyan-800 disabled:cursor-not-allowed text-white rounded-lg font-medium transition flex items-center gap-2"
               >
                 {savingAlertSettings ? (
                   <>

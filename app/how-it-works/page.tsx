@@ -19,7 +19,7 @@ export default function HowItWorksPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900">
       <style jsx global>{`
         @keyframes gradient {
           0% { background-position: 0% 50%; }
@@ -58,7 +58,7 @@ export default function HowItWorksPage() {
       <header className="border-b border-white/10 backdrop-blur-md bg-slate-900/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link href="/" style={{ cursor: 'pointer', fontSize: '24px', fontWeight: 800 }}>
-            <span className="gradient-text">AdWyse</span>
+            <span className="gradient-text">SyncFlow</span>
           </Link>
           <nav className="flex gap-8">
             <Link href="/" className="text-white/80 hover:text-white transition-colors">Home</Link>
@@ -71,14 +71,14 @@ export default function HowItWorksPage() {
       {/* Hero Section */}
       <section className="relative py-24 overflow-hidden">
         <div ref={parallaxRef} className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-cyan-500 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-red-500 rounded-full blur-3xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
             <h1 className="text-6xl font-bold text-white mb-6">
-              How <span className="gradient-text">AdWyse</span> Works
+              How <span className="gradient-text">SyncFlow</span> Works
             </h1>
             <p className="text-xl text-white/70 max-w-3xl mx-auto">
               From ad click to revenue attribution in 4 simple steps
@@ -93,22 +93,22 @@ export default function HowItWorksPage() {
           <div className="grid md:grid-cols-4 gap-8 mb-20">
             {/* Step 1 */}
             <div className="relative">
-              <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-600 rounded-full flex items-center justify-center mb-6">
+              <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-cyan-500/50 transition-all h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-full flex items-center justify-center mb-6">
                   <span className="text-2xl font-bold text-white">1</span>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-4">Install & Connect</h3>
                 <p className="text-white/70">
-                  Install AdWyse from Shopify App Store. Connect Facebook Ads and Google Ads via OAuth. Setup takes 2 minutes.
+                  Install SyncFlow from Shopify App Store. Connect Facebook Ads and Google Ads via OAuth. Setup takes 2 minutes.
                 </p>
               </div>
-              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-orange-600 to-transparent"></div>
+              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-cyan-600 to-transparent"></div>
             </div>
 
             {/* Step 2 */}
             <div className="relative">
-              <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-600 rounded-full flex items-center justify-center mb-6">
+              <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-cyan-500/50 transition-all h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-full flex items-center justify-center mb-6">
                   <span className="text-2xl font-bold text-white">2</span>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-4">Track Every Click</h3>
@@ -116,13 +116,13 @@ export default function HowItWorksPage() {
                   When customers click your ads, we capture UTM parameters, Facebook Click IDs (FBCLID), and Google Click IDs (GCLID) automatically.
                 </p>
               </div>
-              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-orange-600 to-transparent"></div>
+              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-cyan-600 to-transparent"></div>
             </div>
 
             {/* Step 3 */}
             <div className="relative">
-              <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-600 rounded-full flex items-center justify-center mb-6">
+              <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-cyan-500/50 transition-all h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-full flex items-center justify-center mb-6">
                   <span className="text-2xl font-bold text-white">3</span>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-4">Match & Calculate</h3>
@@ -130,13 +130,13 @@ export default function HowItWorksPage() {
                   We sync ad spend from Facebook/Google APIs daily, match orders to campaigns, and calculate true ROAS for each ad.
                 </p>
               </div>
-              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-orange-600 to-transparent"></div>
+              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-cyan-600 to-transparent"></div>
             </div>
 
             {/* Step 4 */}
             <div>
-              <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-orange-500/50 transition-all h-full">
-                <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-600 rounded-full flex items-center justify-center mb-6">
+              <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:border-cyan-500/50 transition-all h-full">
+                <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 to-blue-600 rounded-full flex items-center justify-center mb-6">
                   <span className="text-2xl font-bold text-white">4</span>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-4">Get AI Insights</h3>
@@ -150,48 +150,48 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Deep Dive Sections */}
-      <section className="py-20 relative bg-gradient-to-b from-transparent via-orange-900/10 to-transparent">
+      <section className="py-20 relative bg-gradient-to-b from-transparent via-cyan-900/10 to-transparent">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-6">Under the Hood</h2>
             <p className="text-xl text-white/70">
-              Here's what makes AdWyse different from generic attribution tools
+              Here's what makes SyncFlow different from generic attribution tools
             </p>
           </div>
 
           <div className="space-y-12">
             {/* Attribution Tracking */}
-            <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-10">
+            <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-10">
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
                   <h3 className="text-3xl font-bold text-white mb-4">Multi-Source Attribution</h3>
                   <p className="text-white/70 mb-4">
-                    iOS 14 broke Facebook Pixel and Google Analytics tracking. AdWyse fixes it by using multiple attribution methods simultaneously.
+                    iOS 14 broke Facebook Pixel and Google Analytics tracking. SyncFlow fixes it by using multiple attribution methods simultaneously.
                   </p>
                   <p className="text-white/70 mb-4">
                     We track:
                   </p>
                   <ul className="space-y-2 text-white/70">
                     <li className="flex items-start gap-3">
-                      <svg className="w-6 h-6 text-orange-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span><strong>UTM Parameters:</strong> Campaign source, medium, campaign name, content, and term</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-6 h-6 text-orange-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span><strong>FBCLID:</strong> Facebook Click ID that survives iOS 14 restrictions</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-6 h-6 text-orange-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span><strong>GCLID:</strong> Google Click ID for precise Google Ads attribution</span>
                     </li>
                     <li className="flex items-start gap-3">
-                      <svg className="w-6 h-6 text-orange-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-cyan-400 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span><strong>Landing Site Referrer:</strong> Shopify's native tracking data</span>
@@ -208,13 +208,13 @@ export default function HowItWorksPage() {
                     Ad Spend: $8.40<br/>
                     <span className="text-green-400">ROAS: 15.2x</span>
                   </div>
-                  <p className="text-orange-400 text-xs mt-3">^ Tracked automatically via Shopify webhook</p>
+                  <p className="text-cyan-400 text-xs mt-3">^ Tracked automatically via Shopify webhook</p>
                 </div>
               </div>
             </div>
 
             {/* ROAS Calculations */}
-            <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-10">
+            <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-10">
               <h3 className="text-3xl font-bold text-white mb-6 text-center">True ROAS Calculations</h3>
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="bg-slate-800/50 rounded-xl p-6">
@@ -242,7 +242,7 @@ export default function HowItWorksPage() {
                       </svg>
                     </div>
                     <div>
-                      <h4 className="text-xl font-bold text-white">AdWyse's Real ROAS</h4>
+                      <h4 className="text-xl font-bold text-white">SyncFlow's Real ROAS</h4>
                       <p className="text-green-400 text-sm">Server-Side Tracking</p>
                     </div>
                   </div>
@@ -259,10 +259,10 @@ export default function HowItWorksPage() {
             </div>
 
             {/* AI Insights */}
-            <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-10">
+            <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-10">
               <h3 className="text-3xl font-bold text-white mb-6">AI-Powered Insights</h3>
               <p className="text-white/70 mb-6">
-                Most attribution tools just show you data. AdWyse uses Claude AI to tell you exactly what to do:
+                Most attribution tools just show you data. SyncFlow uses Claude AI to tell you exactly what to do:
               </p>
               <div className="grid md:grid-cols-3 gap-6">
                 <div className="bg-slate-800/50 rounded-xl p-6">
@@ -304,7 +304,7 @@ export default function HowItWorksPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center">
+            <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center">
               <div className="w-20 h-20 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl font-bold text-white">S</span>
               </div>
@@ -314,7 +314,7 @@ export default function HowItWorksPage() {
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center">
+            <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center">
               <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl font-bold text-white">f</span>
               </div>
@@ -324,7 +324,7 @@ export default function HowItWorksPage() {
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-orange-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center">
+            <div className="bg-gradient-to-br from-cyan-600/10 to-red-600/10 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center">
               <div className="w-20 h-20 bg-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl font-bold text-white">G</span>
               </div>
@@ -379,7 +379,7 @@ export default function HowItWorksPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="text-2xl font-bold gradient-text mb-4">AdWyse</div>
+              <div className="text-2xl font-bold gradient-text mb-4">SyncFlow</div>
               <p className="text-white/60">AI-powered ad attribution for Shopify</p>
             </div>
             <div>
@@ -399,11 +399,11 @@ export default function HowItWorksPage() {
             </div>
             <div>
               <h4 className="text-white font-semibold mb-4">Contact</h4>
-              <p className="text-white/60">adam@adwyse.ca</p>
+              <p className="text-white/60">support@syncflow.app</p>
             </div>
           </div>
           <div className="border-t border-white/10 pt-8 text-center text-white/60">
-            <p>&copy; 2025 AdWyse. All rights reserved.</p>
+            <p>&copy; 2025 SyncFlow. All rights reserved.</p>
           </div>
         </div>
       </footer>

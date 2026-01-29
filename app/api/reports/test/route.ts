@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     };
 
     const html = generateReportEmail(testData);
-    const subject = '📊 AdWyse Test Report';
+    const subject = '📊 SyncFlow Test Report';
 
     const success = await sendReportEmail(email, subject, html);
 

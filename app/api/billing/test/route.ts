@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Visit: https://adwyse.ca/api/billing/test?shop=argora-test.myshopify.com
+// Visit: https://syncflow.ca/api/billing/test?shop=argora-test.myshopify.com
 // This will create a billing charge and redirect you to approve it
 
 export async function GET(request: NextRequest) {
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
       },
       body: JSON.stringify({
         recurring_application_charge: {
-          name: 'AdWyse - Pro Plan',
+          name: 'SyncFlow - Pro Plan',
           price: 99.99,
           trial_days: 7,
           return_url: returnUrl,

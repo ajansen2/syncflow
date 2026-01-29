@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
 
           // Find matching campaign in our database by platform_campaign_id and today's date
           const { data: existingCampaigns } = await supabase
-            .from('adwyse_campaigns')
+            .from('syncflow_campaigns')
             .select('*')
             .eq('store_id', storeId)
             .eq('platform_campaign_id', fbCampaign.id)
@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
             const campaign = existingCampaigns[0];
 
             await supabase
-              .from('adwyse_campaigns')
+              .from('syncflow_campaigns')
               .update({
                 spend: fbCampaign.spend,
                 impressions: fbCampaign.impressions,
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
             console.log(`➕ [SYNC] Inserting new campaign: ${fbCampaign.name}`);
             const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
             const { data: newCampaign, error: insertError } = await supabase
-              .from('adwyse_campaigns')
+              .from('syncflow_campaigns')
               .insert({
                 store_id: storeId,
                 ad_account_id: account.id,

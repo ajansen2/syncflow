@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
         // Store uninstalled - delete all store data (48 hours after uninstall)
         console.log('🗑️  Shop data redaction:', payload.shop_domain);
 
-        // Get all stores for this shop (AdWyse uses shop_domain)
+        // Get all stores for this shop (SyncFlow uses shop_domain)
         const { data: stores } = await supabase
           .from('stores')
           .select('id')

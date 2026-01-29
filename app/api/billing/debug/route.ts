@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 // Debug endpoint to check what's in the database
-// Visit: https://adwyse.ca/api/billing/debug?shop=argora-test.myshopify.com
+// Visit: https://syncflow.ca/api/billing/debug?shop=argora-test.myshopify.com
 
 export async function GET(request: NextRequest) {
   const shop = request.nextUrl.searchParams.get('shop');

@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
           customer_id: data.customer?.id,
           customer_email: data.customer?.email,
         });
-        // AdWyse stores minimal data - acknowledge the request
+        // SyncFlow stores minimal data - acknowledge the request
         // Merchants can export data from the dashboard if needed
         break;
       }
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         if (data.customer?.email) {
           // Anonymize customer email in orders
           const { error } = await supabase
-            .from('adwyse_orders')
+            .from('syncflow_orders')
             .update({
               customer_email: 'redacted@privacy.local',
             })
@@ -103,18 +103,18 @@ export async function POST(request: NextRequest) {
 
         // Find the store
         const { data: store } = await supabase
-          .from('adwyse_stores')
+          .from('syncflow_stores')
           .select('id')
           .eq('shop_domain', data.shop_domain)
           .single();
 
         if (store) {
           // Delete all associated data (use correct table names)
-          await supabase.from('adwyse_insights').delete().eq('store_id', store.id);
-          await supabase.from('adwyse_campaigns').delete().eq('store_id', store.id);
-          await supabase.from('adwyse_orders').delete().eq('store_id', store.id);
-          await supabase.from('adwyse_ad_accounts').delete().eq('store_id', store.id);
-          await supabase.from('adwyse_stores').delete().eq('id', store.id);
+          await supabase.from('syncflow_insights').delete().eq('store_id', store.id);
+          await supabase.from('syncflow_campaigns').delete().eq('store_id', store.id);
+          await supabase.from('syncflow_orders').delete().eq('store_id', store.id);
+          await supabase.from('syncflow_ad_accounts').delete().eq('store_id', store.id);
+          await supabase.from('syncflow_stores').delete().eq('id', store.id);
 
           console.log('All shop data deleted for:', data.shop_domain);
         }

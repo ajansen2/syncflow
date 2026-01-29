@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Get all stores for this shop (AdWyse uses shop_domain column)
+    // Get all stores for this shop (SyncFlow uses shop_domain column)
     const { data: stores } = await supabase
       .from('stores')
       .select('id')

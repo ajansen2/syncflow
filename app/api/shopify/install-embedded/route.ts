@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // AdWyse schema: Check if store already exists by shop_domain
+    // SyncFlow schema: Check if store already exists by shop_domain
     const { data: existingStore, error: lookupError } = await supabase
       .from('stores')
       .select('*')
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     if (existingStore) {
       console.log('✅ Store already exists:', existingStore.id);
 
-      // Map store data to merchant format (AdWyse: store IS the merchant)
+      // Map store data to merchant format (SyncFlow: store IS the merchant)
       let subscriptionTier = 'trial';
       if (existingStore.subscription_status === 'active') {
         subscriptionTier = 'pro';

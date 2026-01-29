@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // Get store by shop domain (AdWyse uses shop_domain column)
+    // Get store by shop domain (SyncFlow uses shop_domain column)
     const { data: store, error: storeError } = await supabase
       .from('stores')
       .select('id')

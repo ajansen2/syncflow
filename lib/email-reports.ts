@@ -33,11 +33,11 @@ export function generateReportEmail(data: ReportData): string {
   // Generate Shopify admin URL for the dashboard
   const shopName = data.shopDomain?.replace('.myshopify.com', '') || '';
   const dashboardUrl = shopName
-    ? `https://admin.shopify.com/store/${shopName}/apps/adwyse/dashboard`
-    : 'https://adwyse.ca/dashboard';
+    ? `https://admin.shopify.com/store/${shopName}/apps/syncflow/dashboard`
+    : 'https://syncflow.ca/dashboard';
   const settingsUrl = shopName
-    ? `https://admin.shopify.com/store/${shopName}/apps/adwyse/dashboard/settings`
-    : 'https://adwyse.ca/dashboard/settings';
+    ? `https://admin.shopify.com/store/${shopName}/apps/syncflow/dashboard/settings`
+    : 'https://syncflow.ca/dashboard/settings';
 
   return `
 <!DOCTYPE html>
@@ -45,7 +45,7 @@ export function generateReportEmail(data: ReportData): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AdWyse Performance Report</title>
+  <title>SyncFlow Performance Report</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #1a1a2e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #1a1a2e; padding: 40px 20px;">
@@ -55,7 +55,7 @@ export function generateReportEmail(data: ReportData): string {
           <!-- Header -->
           <tr>
             <td style="background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%); padding: 30px; text-align: center;">
-              <img src="https://adwyse.ca/logo.png" alt="AdWyse" width="50" height="50" style="margin-bottom: 10px;">
+              <img src="https://syncflow.ca/logo.png" alt="SyncFlow" width="50" height="50" style="margin-bottom: 10px;">
               <h1 style="color: white; margin: 0; font-size: 24px;">Performance Report</h1>
               <p style="color: rgba(255,255,255,0.8); margin: 10px 0 0 0; font-size: 14px;">${data.storeName} • ${data.dateRange}</p>
             </td>
@@ -140,7 +140,7 @@ export function generateReportEmail(data: ReportData): string {
           <tr>
             <td style="padding: 20px 30px; background-color: rgba(0,0,0,0.2); text-align: center;">
               <p style="color: rgba(255,255,255,0.4); margin: 0; font-size: 12px;">
-                You're receiving this because you enabled email reports in AdWyse.
+                You're receiving this because you enabled email reports in SyncFlow.
                 <br>
                 <a href="${settingsUrl}" style="color: #f97316;">Manage preferences</a>
               </p>
@@ -178,7 +178,7 @@ export async function sendReportEmail(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'AdWyse <reports@send.adwyse.ca>',
+        from: 'SyncFlow <reports@send.syncflow.ca>',
         to: [to],
         subject: subject,
         html: html,

@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Delete/anonymize customer data from our database
-    // For AdWyse, we need to anonymize order data for this customer
+    // For SyncFlow, we need to anonymize order data for this customer
     if (data.customer?.email) {
       // Anonymize the customer email in orders table
       const { error } = await supabase

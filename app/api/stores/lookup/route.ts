@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    // Look up store by shop domain (AdWyse schema: each store is its own merchant)
+    // Look up store by shop domain (SyncFlow schema: each store is its own merchant)
     const { data: storeData, error: storeError } = await supabase
       .from('stores')
       .select('*')
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Store not found' }, { status: 404 });
     }
 
-    // In AdWyse, the store IS the merchant - create a merchant object from store data
+    // In SyncFlow, the store IS the merchant - create a merchant object from store data
     // Map subscription_status to subscription_tier for display
     let subscriptionTier = 'trial'; // Default to trial for new users
     if (storeData.subscription_status === 'active') {

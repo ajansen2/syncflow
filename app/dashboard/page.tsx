@@ -567,9 +567,9 @@ function DashboardContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-solid border-orange-500 border-r-transparent mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-solid border-cyan-500 border-r-transparent mb-4"></div>
           <div className="text-white text-xl">{loadingMessage}</div>
         </div>
       </div>
@@ -579,7 +579,7 @@ function DashboardContent() {
   // Show error if failed to load merchant data
   if (loadError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900 flex items-center justify-center p-6">
         <div className="max-w-lg w-full bg-red-500/10 border-2 border-red-500/50 rounded-xl p-8 text-center">
           <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -589,7 +589,7 @@ function DashboardContent() {
           <h2 className="text-2xl font-bold text-white mb-3">Unable to Load Dashboard</h2>
           <p className="text-white/80 mb-6">{loadError}</p>
           <p className="text-white/60 text-sm">
-            If this issue persists, please contact support at adam@adwyse.ca
+            If this issue persists, please contact support at support@syncflow.app
           </p>
         </div>
       </div>
@@ -641,12 +641,12 @@ function DashboardContent() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `adwyse-orders-${dateRange.label.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `syncflow-orders-${dateRange.label.replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -661,9 +661,9 @@ function DashboardContent() {
           {/* Logo */}
           <div className="p-6 border-b border-white/10">
             <Link href="/" className="flex items-center gap-3">
-              <img src="/logo.png" alt="AdWyse" className="w-10 h-10" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">
-                AdWyse
+              <img src="/logo.png" alt="SyncFlow" className="w-10 h-10" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
+                SyncFlow
               </span>
             </Link>
           </div>
@@ -672,7 +672,7 @@ function DashboardContent() {
           <nav className="flex-1 p-4 space-y-2">
             <button
               onClick={() => navigateInApp('/dashboard')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-orange-600/20 text-orange-300 border border-orange-500/30 transition"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-cyan-600/20 text-cyan-300 border border-cyan-500/30 transition"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -715,7 +715,7 @@ function DashboardContent() {
           {/* User Profile */}
           <div className="p-4 border-t border-white/10">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center text-white font-bold">
+              <div className="w-10 h-10 rounded-full bg-cyan-600 flex items-center justify-center text-white font-bold">
                 {merchant.full_name?.charAt(0) || merchant.email.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
@@ -741,7 +741,7 @@ function DashboardContent() {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden text-white hover:text-orange-400 transition"
+                className="lg:hidden text-white hover:text-cyan-400 transition"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -789,7 +789,7 @@ function DashboardContent() {
                             }}
                             className={`w-full text-left px-4 py-2 rounded-lg text-sm transition ${
                               dateRangeOption === option.value
-                                ? 'bg-orange-600 text-white'
+                                ? 'bg-cyan-600 text-white'
                                 : 'text-white/80 hover:bg-white/10'
                             }`}
                           >
@@ -821,7 +821,7 @@ function DashboardContent() {
                             }
                           }}
                           disabled={!customStartDate || !customEndDate}
-                          className="w-full px-3 py-1.5 bg-orange-600 hover:bg-orange-700 disabled:bg-white/10 disabled:text-white/40 rounded text-white text-sm font-medium transition"
+                          className="w-full px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 disabled:bg-white/10 disabled:text-white/40 rounded text-white text-sm font-medium transition"
                         >
                           Apply
                         </button>
@@ -890,7 +890,7 @@ function DashboardContent() {
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-2xl font-bold text-white mb-2">Welcome to AdWyse! 🎉</h3>
+                <h3 className="text-2xl font-bold text-white mb-2">Welcome to SyncFlow! 🎉</h3>
                 <p className="text-green-100 text-lg mb-3">
                   Your Pro Plan subscription is now active!
                 </p>
@@ -928,8 +928,8 @@ function DashboardContent() {
             // Empty State: No Stores Connected
             <div className="max-w-2xl mx-auto mt-20">
               <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-12 text-center">
-                <div className="w-20 h-20 bg-orange-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-10 h-10 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-20 h-20 bg-cyan-600/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-10 h-10 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                   </svg>
                 </div>
@@ -941,7 +941,7 @@ function DashboardContent() {
                   onClick={() => {
                     window.location.href = '/dashboard/connect-store';
                   }}
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-orange-600 to-red-600 rounded-lg text-white font-semibold hover:opacity-90 transition text-lg"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-lg text-white font-semibold hover:opacity-90 transition text-lg"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M16.373 0c-.343 0-1.02.188-1.547.562-1.105.785-1.92 2.012-2.298 3.456-.75.3-1.39.566-1.828.764-.99.45-1.02.48-1.148.72-.1.183-.187.42-.27.7-1.23.397-2.46.784-2.976 1.13C3.563 8.5 3.375 10.874 3 12v4.78l15-3.562V8.5c0-2.437-1.5-4-3.75-4h-1.5c.327-1.163.97-2.25 2.058-3.008C15.39.934 15.933.718 16.375.5c.345-.17.564-.29.747-.406C17.28.002 17.39 0 17.625 0h-1.252zm-1.998 8.5c-.69 0-1.25.56-1.25 1.25s.56 1.25 1.25 1.25 1.25-.56 1.25-1.25-.56-1.25-1.25-1.25zm1.5 7.5H3v4.5c0 1.656 1.344 3 3 3h12c1.656 0 3-1.344 3-3V16h-4.125z"/>
@@ -960,7 +960,7 @@ function DashboardContent() {
                 <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-white/60 text-sm font-medium">Total Orders</h3>
-                    <svg className="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                   </div>
@@ -1024,7 +1024,7 @@ function DashboardContent() {
                         <span className="text-white/60">Total Revenue</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-cyan-500 rounded-full"></div>
                         <span className="text-white/60">Ad Revenue</span>
                       </div>
                     </div>
@@ -1061,7 +1061,7 @@ function DashboardContent() {
                                   {displayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                 </div>
                                 <div className="text-green-400">${day.revenue.toFixed(2)} revenue</div>
-                                <div className="text-orange-400">${day.adRevenue.toFixed(2)} from ads</div>
+                                <div className="text-cyan-400">${day.adRevenue.toFixed(2)} from ads</div>
                                 <div className="text-white/60">{day.orders} orders</div>
                               </div>
                             </div>
@@ -1075,7 +1075,7 @@ function DashboardContent() {
                                 className="absolute inset-0 bg-green-500/60 transition-all group-hover:bg-green-500"
                               />
                               <div
-                                className="absolute inset-x-0 bottom-0 bg-orange-500 transition-all group-hover:bg-orange-400"
+                                className="absolute inset-x-0 bottom-0 bg-cyan-500 transition-all group-hover:bg-cyan-400"
                                 style={{ height: `${adBarHeight}px` }}
                               />
                             </div>
@@ -1204,8 +1204,8 @@ function DashboardContent() {
                   {stores.map((store) => (
                     <div key={store.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-orange-600/20 rounded-lg flex items-center justify-center">
-                          <svg className="w-6 h-6 text-orange-400" fill="currentColor" viewBox="0 0 24 24">
+                        <div className="w-10 h-10 bg-cyan-600/20 rounded-lg flex items-center justify-center">
+                          <svg className="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M16.373 0c-.343 0-1.02.188-1.547.562-1.105.785-1.92 2.012-2.298 3.456-.75.3-1.39.566-1.828.764-.99.45-1.02.48-1.148.72-.1.183-.187.42-.27.7-1.23.397-2.46.784-2.976 1.13C3.563 8.5 3.375 10.874 3 12v4.78l15-3.562V8.5c0-2.437-1.5-4-3.75-4h-1.5c.327-1.163.97-2.25 2.058-3.008C15.39.934 15.933.718 16.375.5c.345-.17.564-.29.747-.406C17.28.002 17.39 0 17.625 0h-1.252z"/>
                           </svg>
                         </div>
@@ -1238,13 +1238,13 @@ function DashboardContent() {
                     <div className="flex-1">
                       <h3 className="text-white font-semibold mb-2">How Attribution Tracking Works</h3>
                       <p className="text-white/70 text-sm mb-3">
-                        AdWyse automatically tracks every order and shows you exactly which ads are driving sales. 100% automatic, no setup required.
+                        SyncFlow automatically tracks every order and shows you exactly which ads are driving sales. 100% automatic, no setup required.
                       </p>
                       <div className="bg-white/5 rounded-lg p-4 text-sm text-white/60">
                         <p className="mb-2"><strong className="text-white/80">How it works:</strong></p>
                         <ol className="list-decimal list-inside space-y-1 ml-2">
                           <li>Customers click on your Facebook, Google, or TikTok ads</li>
-                          <li>When they purchase, AdWyse automatically tracks which ad drove the sale</li>
+                          <li>When they purchase, SyncFlow automatically tracks which ad drove the sale</li>
                           <li>Orders appear here with full attribution data (source, campaign, etc.)</li>
                           <li>Connect ad accounts in Settings to see ROAS and get AI insights</li>
                         </ol>
@@ -1278,8 +1278,8 @@ function DashboardContent() {
                       return (
                         <div key={order.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
                           <div className="flex items-center gap-4 flex-1">
-                            <div className="w-12 h-12 bg-orange-600/20 rounded-full flex items-center justify-center">
-                              <span className="text-orange-300 font-bold text-lg">
+                            <div className="w-12 h-12 bg-cyan-600/20 rounded-full flex items-center justify-center">
+                              <span className="text-cyan-300 font-bold text-lg">
                                 {order.customer_email?.charAt(0).toUpperCase() || '#'}
                               </span>
                             </div>
@@ -1355,9 +1355,9 @@ function DashboardContent() {
 export default function DashboardPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-orange-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-solid border-orange-500 border-r-transparent mb-4"></div>
+          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-solid border-cyan-500 border-r-transparent mb-4"></div>
           <div className="text-white text-xl">Loading dashboard...</div>
         </div>
       </div>

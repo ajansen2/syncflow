@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    // In AdWyse schema, merchant_id IS the store_id (each store is its own merchant)
+    // In SyncFlow schema, merchant_id IS the store_id (each store is its own merchant)
     // Get orders for this store
     const { data: orders, error: ordersError } = await supabase
       .from('orders')

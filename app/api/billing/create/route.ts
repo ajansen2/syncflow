@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     console.log('✅ [BILLING CREATE] Found store:', store.shop_domain);
 
     const accessToken = store.access_token;
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://adwyse.ca';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://syncflow.ca';
 
     // Check if we have a valid access token
     if (!accessToken || accessToken === '' || accessToken === 'revoked') {
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           recurring_application_charge: {
-            name: 'AdWyse - Pro Plan',
+            name: 'SyncFlow - Pro Plan',
             price: 99.99,
             trial_days: 7,
             return_url: returnUrl,

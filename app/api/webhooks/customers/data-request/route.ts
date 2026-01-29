@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       customer_email: data.customer?.email,
     });
 
-    // For AdWyse, we store minimal customer data (only order info with emails)
+    // For SyncFlow, we store minimal customer data (only order info with emails)
     // In a real implementation, you would:
     // 1. Query your database for all data related to this customer
     // 2. Compile it into a format that can be sent to the customer
