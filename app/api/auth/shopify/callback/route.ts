@@ -1,0 +1,209 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
+
+/**
+ * ChannelSync - Shopify OAuth Callback
+ * Handles token exchange, store creation, and billing
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const code = searchParams.get('code');
+    const shop = searchParams.get('shop');
+    const state = searchParams.get('state');
+    const hmac = searchParams.get('hmac');
+
+    if (!code || !shop) {
+      return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
+    }
+
+    // State validation
+    const storedState = request.cookies.get('shopify_oauth_state')?.value;
+    if (storedState && state && state !== storedState) {
+      return NextResponse.json({ error: 'Invalid state parameter' }, { status: 400 });
+    }
+
+    // Verify HMAC
+    const query = new URLSearchParams(searchParams.toString());
+    query.delete('hmac');
+    const message = Array.from(query.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, val]) => `${key}=${val}`)
+      .join('&');
+
+    const generatedHmac = crypto
+      .createHmac('sha256', process.env.SHOPIFY_API_SECRET!)
+      .update(message)
+      .digest('hex');
+
+    if (generatedHmac !== hmac) {
+      console.error('❌ HMAC validation failed');
+      return NextResponse.json({ error: 'HMAC validation failed' }, { status: 403 });
+    }
+
+    console.log('✅ HMAC validated');
+
+    // Exchange code for access token
+    const apiKey = process.env.SHOPIFY_API_KEY;
+    const apiSecret = process.env.SHOPIFY_API_SECRET;
+
+    const tokenResponse = await fetch(`https://${shop}/admin/oauth/access_token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_id: apiKey,
+        client_secret: apiSecret,
+        code,
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      throw new Error('Failed to exchange code for access token');
+    }
+
+    const tokenData = await tokenResponse.json();
+    const accessToken = tokenData.access_token;
+
+    // Get shop details
+    const shopResponse = await fetch(`https://${shop}/admin/api/2024-10/shop.json`, {
+      headers: { 'X-Shopify-Access-Token': accessToken },
+    });
+
+    const shopData = await shopResponse.json();
+    const shopInfo = shopData.shop;
+
+    // Save store to database
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data: existingStore } = await supabase
+      .from('stores')
+      .select('*')
+      .eq('shop_domain', shop)
+      .maybeSingle();
+
+    let store;
+
+    if (existingStore) {
+      const { data: updatedStore } = await supabase
+        .from('stores')
+        .update({
+          access_token: accessToken,
+          store_name: shopInfo.name || shop,
+          email: shopInfo.email,
+          currency: shopInfo.currency,
+          timezone: shopInfo.iana_timezone,
+          subscription_status: 'trial',
+          trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existingStore.id)
+        .select()
+        .single();
+
+      store = updatedStore;
+    } else {
+      const { data: newStore } = await supabase
+        .from('stores')
+        .insert({
+          shop_domain: shop,
+          store_name: shopInfo.name || shop,
+          email: shopInfo.email,
+          access_token: accessToken,
+          currency: shopInfo.currency,
+          timezone: shopInfo.iana_timezone,
+          subscription_status: 'trial',
+          trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+        })
+        .select()
+        .single();
+
+      store = newStore;
+    }
+
+    console.log('✅ Store ready:', store.id);
+
+    // Create/update Shopify channel connection
+    await supabase.from('channel_connections').upsert({
+      store_id: store.id,
+      platform: 'shopify',
+      account_id: shopInfo.id?.toString(),
+      account_name: shopInfo.name,
+      access_token: accessToken,
+      is_active: true,
+      last_sync_at: new Date().toISOString(),
+      sync_status: 'pending',
+      updated_at: new Date().toISOString(),
+    }, {
+      onConflict: 'store_id,platform,marketplace',
+    });
+
+    // Register webhooks for order syncing
+    const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/shopify`;
+
+    const webhookTopics = [
+      { topic: 'orders/create', address: `${webhookUrl}/orders` },
+      { topic: 'orders/updated', address: `${webhookUrl}/orders` },
+      { topic: 'refunds/create', address: `${webhookUrl}/refunds` },
+      { topic: 'app/uninstalled', address: `${webhookUrl}/uninstall` },
+    ];
+
+    for (const webhook of webhookTopics) {
+      await fetch(`https://${shop}/admin/api/2024-10/webhooks.json`, {
+        method: 'POST',
+        headers: {
+          'X-Shopify-Access-Token': accessToken,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ webhook: { ...webhook, format: 'json' } }),
+      });
+    }
+
+    console.log('✅ Webhooks registered');
+
+    // Create billing charge ($29/month with 14-day trial)
+    const isTestCharge = shop.includes('-test') || shop.includes('development') || shop.includes('dev-');
+    const shopName = shop.replace('.myshopify.com', '');
+    const returnUrl = `https://admin.shopify.com/store/${shopName}/apps/${apiKey}`;
+
+    const chargeResponse = await fetch(`https://${shop}/admin/api/2024-10/recurring_application_charges.json`, {
+      method: 'POST',
+      headers: {
+        'X-Shopify-Access-Token': accessToken,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        recurring_application_charge: {
+          name: 'ChannelSync - All Channels',
+          price: 29.00,
+          trial_days: 14,
+          return_url: returnUrl,
+          ...(isTestCharge && { test: true }),
+        }
+      })
+    });
+
+    if (chargeResponse.ok) {
+      const chargeData = await chargeResponse.json();
+      const confirmationUrl = chargeData.recurring_application_charge.confirmation_url;
+
+      console.log('✅ Billing charge created');
+
+      const response = NextResponse.redirect(confirmationUrl);
+      response.cookies.delete('shopify_oauth_state');
+      return response;
+    }
+
+    // Fallback to dashboard if billing fails
+    const response = NextResponse.redirect(`https://admin.shopify.com/store/${shopName}/apps/${apiKey}?shop=${shop}`);
+    response.cookies.delete('shopify_oauth_state');
+    return response;
+
+  } catch (error) {
+    console.error('OAuth callback error:', error);
+    return NextResponse.json({ error: 'OAuth failed' }, { status: 500 });
+  }
+}
