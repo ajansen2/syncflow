@@ -115,14 +115,17 @@ async function syncShopifyOrders(supabase: any, storeId: string, connection: any
     .eq('id', storeId)
     .single();
 
+  if (!store) return 0;
+
+  const shopDomain: string = store.shop_domain;
   let synced = 0;
   let pageInfo: string | null = null;
   let hasNextPage = true;
 
   while (hasNextPage) {
-    const url = pageInfo
-      ? `https://${store.shop_domain}/admin/api/2024-10/orders.json?limit=250&page_info=${pageInfo}`
-      : `https://${store.shop_domain}/admin/api/2024-10/orders.json?limit=250&created_at_min=${startDate.toISOString()}&status=any`;
+    const url: string = pageInfo
+      ? `https://${shopDomain}/admin/api/2024-10/orders.json?limit=250&page_info=${pageInfo}`
+      : `https://${shopDomain}/admin/api/2024-10/orders.json?limit=250&created_at_min=${startDate.toISOString()}&status=any`;
 
     const response = await fetch(url, {
       headers: { 'X-Shopify-Access-Token': connection.access_token },
