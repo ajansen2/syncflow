@@ -55,6 +55,13 @@ function SettingsContent() {
           const data = JSON.parse(xhr.responseText);
           if (data.store) {
             setStore(data.store);
+            // Load saved settings
+            if (data.store.sync_frequency) {
+              setSyncFrequency(data.store.sync_frequency);
+            }
+            if (data.store.email_report_frequency) {
+              setEmailReportFrequency(data.store.email_report_frequency);
+            }
 
             if (supabase) {
               const { data: channelsData } = await supabase
@@ -76,38 +83,59 @@ function SettingsContent() {
     loadData();
   }, [searchParams, supabase]);
 
-  const handleSaveSyncSettings = () => {
+  const handleSaveSyncSettings = async () => {
     if (!store) return;
 
     setSavingSyncSettings(true);
     try {
-      // Save sync settings
-      setTimeout(() => {
+      const response = await fetch('/api/stores/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          store_id: store.id,
+          sync_frequency: syncFrequency,
+        }),
+      });
+
+      if (response.ok) {
         setSuccessMessage('Sync settings saved');
         setTimeout(() => setSuccessMessage(''), 3000);
-        setSavingSyncSettings(false);
-      }, 500);
+      } else {
+        throw new Error('Failed to save');
+      }
     } catch (error) {
       setErrorMessage('Failed to save sync settings');
       setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
       setSavingSyncSettings(false);
     }
   };
 
-  const handleSaveEmailSettings = (frequency: 'none' | 'weekly' | 'monthly') => {
+  const handleSaveEmailSettings = async (frequency: 'none' | 'weekly' | 'monthly') => {
     if (!store) return;
 
     setSavingEmailSettings(true);
     try {
-      setEmailReportFrequency(frequency);
-      setTimeout(() => {
+      const response = await fetch('/api/stores/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          store_id: store.id,
+          email_report_frequency: frequency,
+        }),
+      });
+
+      if (response.ok) {
+        setEmailReportFrequency(frequency);
         setSuccessMessage(`Email reports ${frequency === 'none' ? 'disabled' : `set to ${frequency}`}`);
         setTimeout(() => setSuccessMessage(''), 3000);
-        setSavingEmailSettings(false);
-      }, 500);
+      } else {
+        throw new Error('Failed to save');
+      }
     } catch (error) {
       setErrorMessage('Failed to update email settings');
       setTimeout(() => setErrorMessage(''), 3000);
+    } finally {
       setSavingEmailSettings(false);
     }
   };

@@ -18,9 +18,22 @@ CREATE TABLE IF NOT EXISTS stores (
   trial_ends_at TIMESTAMPTZ,
   currency TEXT DEFAULT 'USD',
   timezone TEXT DEFAULT 'America/New_York',
+  sync_frequency TEXT DEFAULT 'daily', -- 'hourly', 'daily', 'manual'
+  email_report_frequency TEXT DEFAULT 'none', -- 'none', 'weekly', 'monthly'
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Add sync_frequency column if it doesn't exist (for existing tables)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'stores' AND column_name = 'sync_frequency') THEN
+    ALTER TABLE stores ADD COLUMN sync_frequency TEXT DEFAULT 'daily';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'stores' AND column_name = 'email_report_frequency') THEN
+    ALTER TABLE stores ADD COLUMN email_report_frequency TEXT DEFAULT 'none';
+  END IF;
+END $$;
 
 -- ============================================
 -- CHANNEL CONNECTIONS TABLE

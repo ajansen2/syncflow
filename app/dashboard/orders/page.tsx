@@ -8,21 +8,20 @@ import Link from 'next/link';
 
 interface Order {
   id: string;
-  shopify_order_id: string;
+  platform: string;
+  platform_order_id: string;
   order_number: string;
-  customer_email: string | null;
-  total_price: number;
+  order_date: string;
+  gross_revenue: number;
+  shipping_revenue: number;
+  tax_collected: number;
+  platform_fees: number;
+  payment_processing_fee: number;
+  shipping_cost: number;
+  net_revenue: number;
+  financial_status: string;
+  fulfillment_status: string;
   currency: string;
-  attributed_platform: string;
-  utm_source: string | null;
-  utm_medium: string | null;
-  utm_campaign: string | null;
-  utm_content: string | null;
-  utm_term: string | null;
-  fbclid: string | null;
-  gclid: string | null;
-  ttclid: string | null;
-  order_created_at: string;
   created_at: string;
 }
 
@@ -48,44 +47,49 @@ function OrdersContent() {
           return;
         }
 
-        // Get merchant ID from store lookup
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', `/api/stores/lookup?shop=${encodeURIComponent(shop)}`, false);
-        xhr.send();
+        // Get store by shop domain
+        const { data: store, error: storeError } = await supabase
+          .from('stores')
+          .select('id')
+          .eq('shop_domain', shop)
+          .single();
 
-        if (xhr.status === 200) {
-          const data = JSON.parse(xhr.responseText);
+        if (storeError || !store) {
+          console.error('Store not found:', storeError);
+          setLoading(false);
+          return;
+        }
 
-          if (data.merchant) {
-            // Fetch orders
-            const ordersXhr = new XMLHttpRequest();
-            ordersXhr.open('GET', `/api/orders/list?merchant_id=${data.merchant.id}`, false);
-            ordersXhr.send();
+        // Fetch orders for this store
+        const { data: ordersData, error: ordersError } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('store_id', store.id)
+          .order('order_date', { ascending: false });
 
-            if (ordersXhr.status === 200) {
-              const ordersData = JSON.parse(ordersXhr.responseText);
-              setOrders(ordersData.orders || []);
-              setFilteredOrders(ordersData.orders || []);
-            }
-          }
+        if (ordersError) {
+          console.error('Error fetching orders:', ordersError);
+        } else {
+          setOrders(ordersData || []);
+          setFilteredOrders(ordersData || []);
         }
       } catch (error) {
-        console.error('❌ Error loading orders:', error);
+        console.error('Error loading orders:', error);
       } finally {
         setLoading(false);
       }
     };
 
     loadOrders();
-  }, [searchParams]);
+  }, [searchParams, supabase]);
 
   // Filter orders when filter or search changes
   useEffect(() => {
     let filtered = orders;
 
-    // Filter by ad source
+    // Filter by platform
     if (filterSource !== 'all') {
-      filtered = filtered.filter(order => order.attributed_platform === filterSource);
+      filtered = filtered.filter(order => order.platform === filterSource);
     }
 
     // Search filter
@@ -93,8 +97,7 @@ function OrdersContent() {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(order =>
         order.order_number?.toLowerCase().includes(query) ||
-        order.customer_email?.toLowerCase().includes(query) ||
-        order.utm_campaign?.toLowerCase().includes(query)
+        order.platform_order_id?.toLowerCase().includes(query)
       );
     }
 
@@ -102,12 +105,14 @@ function OrdersContent() {
     setCurrentPage(1); // Reset to first page when filters change
   }, [orders, filterSource, searchQuery]);
 
-  // Get unique ad sources for filter dropdown
-  const adSources = Array.from(new Set(orders.map(order => order.attributed_platform))).filter(Boolean);
+  // Get unique platforms for filter dropdown
+  const platforms = Array.from(new Set(orders.map(order => order.platform))).filter(Boolean);
 
   // Calculate totals
-  const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.total_price, 0);
-  const averageOrderValue = filteredOrders.length > 0 ? totalRevenue / filteredOrders.length : 0;
+  const totalGrossRevenue = filteredOrders.reduce((sum, order) => sum + (order.gross_revenue || 0), 0);
+  const totalNetRevenue = filteredOrders.reduce((sum, order) => sum + (order.net_revenue || 0), 0);
+  const totalFees = filteredOrders.reduce((sum, order) =>
+    sum + (order.platform_fees || 0) + (order.payment_processing_fee || 0) + (order.shipping_cost || 0), 0);
 
   if (loading) {
     return (
@@ -126,17 +131,37 @@ function OrdersContent() {
   const exportToCSV = () => {
     if (filteredOrders.length === 0) return;
 
-    const headers = ['Order Number', 'Customer Email', 'Total', 'Currency', 'Platform', 'UTM Source', 'UTM Medium', 'UTM Campaign', 'Order Date'];
+    // QuickBooks/Xero compatible format
+    const headers = [
+      'Date',
+      'Reference',
+      'Description',
+      'Platform',
+      'Gross Revenue',
+      'Shipping Revenue',
+      'Tax Collected',
+      'Platform Fees',
+      'Payment Processing Fee',
+      'Shipping Cost',
+      'Net Revenue',
+      'Currency',
+      'Status'
+    ];
+
     const rows = filteredOrders.map(order => [
-      order.order_number,
-      order.customer_email || '',
-      order.total_price.toFixed(2),
+      new Date(order.order_date).toISOString().split('T')[0], // YYYY-MM-DD format
+      order.order_number || order.platform_order_id,
+      `${order.platform} Order ${order.order_number}`,
+      order.platform,
+      order.gross_revenue.toFixed(2),
+      order.shipping_revenue.toFixed(2),
+      order.tax_collected.toFixed(2),
+      order.platform_fees.toFixed(2),
+      order.payment_processing_fee.toFixed(2),
+      order.shipping_cost.toFixed(2),
+      order.net_revenue.toFixed(2),
       order.currency,
-      order.attributed_platform || 'Direct',
-      order.utm_source || '',
-      order.utm_medium || '',
-      order.utm_campaign || '',
-      new Date(order.order_created_at).toLocaleDateString()
+      order.financial_status || 'completed'
     ]);
 
     const csvContent = [
@@ -231,18 +256,22 @@ function OrdersContent() {
 
         <div className="p-6">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
               <h3 className="text-white/60 text-sm font-medium mb-2">Total Orders</h3>
               <div className="text-3xl font-bold text-white">{filteredOrders.length}</div>
             </div>
             <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
-              <h3 className="text-white/60 text-sm font-medium mb-2">Total Revenue</h3>
-              <div className="text-3xl font-bold text-white">${totalRevenue.toFixed(2)}</div>
+              <h3 className="text-white/60 text-sm font-medium mb-2">Gross Revenue</h3>
+              <div className="text-3xl font-bold text-white">${totalGrossRevenue.toFixed(2)}</div>
             </div>
             <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
-              <h3 className="text-white/60 text-sm font-medium mb-2">Average Order Value</h3>
-              <div className="text-3xl font-bold text-white">${averageOrderValue.toFixed(2)}</div>
+              <h3 className="text-white/60 text-sm font-medium mb-2">Total Fees</h3>
+              <div className="text-3xl font-bold text-red-400">-${totalFees.toFixed(2)}</div>
+            </div>
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
+              <h3 className="text-white/60 text-sm font-medium mb-2">Net Revenue</h3>
+              <div className="text-3xl font-bold text-green-400">${totalNetRevenue.toFixed(2)}</div>
             </div>
           </div>
 
@@ -253,22 +282,22 @@ function OrdersContent() {
                 <label className="text-white/60 text-sm mb-2 block">Search Orders</label>
                 <input
                   type="text"
-                  placeholder="Search by order #, email, or campaign..."
+                  placeholder="Search by order number..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-cyan-500"
                 />
               </div>
               <div className="w-full md:w-64">
-                <label className="text-white/60 text-sm mb-2 block">Filter by Source</label>
+                <label className="text-white/60 text-sm mb-2 block">Filter by Platform</label>
                 <select
                   value={filterSource}
                   onChange={(e) => setFilterSource(e.target.value)}
                   className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-cyan-500"
                 >
-                  <option value="all">All Sources</option>
-                  {adSources.map(source => (
-                    <option key={source} value={source}>{source}</option>
+                  <option value="all">All Platforms</option>
+                  {platforms.map(platform => (
+                    <option key={platform} value={platform}>{platform.charAt(0).toUpperCase() + platform.slice(1)}</option>
                   ))}
                 </select>
               </div>
@@ -282,62 +311,71 @@ function OrdersContent() {
                 <thead className="bg-white/5 border-b border-white/10">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white/80">Order</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white/80">Customer</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white/80">Total</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white/80">Source</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-white/80">Campaign</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white/80">Platform</th>
+                    <th className="px-6 py-4 text-right text-sm font-semibold text-white/80">Gross</th>
+                    <th className="px-6 py-4 text-right text-sm font-semibold text-white/80">Fees</th>
+                    <th className="px-6 py-4 text-right text-sm font-semibold text-white/80">Net</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white/80">Status</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-white/80">Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10">
-                  {paginatedOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-white/5 transition">
-                      <td className="px-6 py-4">
-                        <div className="text-white font-medium">#{order.order_number}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-white">{order.customer_email || 'No email'}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-white font-bold">${order.total_price.toFixed(2)}</div>
-                        <div className="text-white/40 text-sm">{order.currency}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
-                          order.attributed_platform === 'facebook'
-                            ? 'bg-blue-500/20 text-blue-300'
-                            : order.attributed_platform === 'google'
-                            ? 'bg-red-500/20 text-red-300'
-                            : order.attributed_platform === 'tiktok'
-                            ? 'bg-pink-500/20 text-pink-300'
-                            : 'bg-gray-500/20 text-gray-300'
-                        }`}>
-                          {order.attributed_platform || 'direct'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-white">{order.utm_campaign || '-'}</div>
-                        {order.utm_source && (
-                          <div className="text-white/40 text-sm">UTM: {order.utm_source}</div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-white">
-                          {new Date(order.created_at).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
-                        </div>
-                        <div className="text-white/40 text-sm">
-                          {new Date(order.created_at).toLocaleTimeString('en-US', {
-                            hour: 'numeric',
-                            minute: '2-digit'
-                          })}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {paginatedOrders.map((order) => {
+                    const totalFees = (order.platform_fees || 0) + (order.payment_processing_fee || 0) + (order.shipping_cost || 0);
+                    return (
+                      <tr key={order.id} className="hover:bg-white/5 transition">
+                        <td className="px-6 py-4">
+                          <div className="text-white font-medium">#{order.order_number || order.platform_order_id}</div>
+                          <div className="text-white/40 text-xs">{order.platform_order_id}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                            order.platform === 'amazon'
+                              ? 'bg-orange-500/20 text-orange-300'
+                              : order.platform === 'shopify'
+                              ? 'bg-green-500/20 text-green-300'
+                              : order.platform === 'etsy'
+                              ? 'bg-orange-600/20 text-orange-200'
+                              : 'bg-gray-500/20 text-gray-300'
+                          }`}>
+                            {order.platform.charAt(0).toUpperCase() + order.platform.slice(1)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="text-white font-medium">${(order.gross_revenue || 0).toFixed(2)}</div>
+                          <div className="text-white/40 text-xs">{order.currency}</div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="text-red-400">-${totalFees.toFixed(2)}</div>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="text-green-400 font-bold">${(order.net_revenue || 0).toFixed(2)}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex px-2 py-1 rounded text-xs font-medium ${
+                            order.financial_status === 'paid'
+                              ? 'bg-green-500/20 text-green-300'
+                              : order.financial_status === 'pending'
+                              ? 'bg-yellow-500/20 text-yellow-300'
+                              : order.financial_status === 'refunded'
+                              ? 'bg-red-500/20 text-red-300'
+                              : 'bg-gray-500/20 text-gray-300'
+                          }`}>
+                            {order.financial_status || 'Unknown'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-white">
+                            {order.order_date ? new Date(order.order_date).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            }) : '-'}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
