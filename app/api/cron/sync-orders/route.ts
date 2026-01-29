@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { syncStoreOrders } from '@/lib/sync-orders';
 
 /**
  * Cron Job: Sync Orders for All Active Stores
  * Called by Vercel Cron based on schedule
- *
- * Frequency query param:
- * - 'hourly' - runs every hour
- * - 'daily' - runs once per day
  */
 export async function GET(request: NextRequest) {
   try {
@@ -26,73 +23,47 @@ export async function GET(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Get all active stores with matching sync frequency
-    // For now, sync all stores. Later we can add sync_frequency column
+    // Get all stores (active or trial)
     const { data: stores, error } = await supabase
       .from('stores')
       .select('id, shop_domain, sync_frequency')
-      .eq('subscription_status', 'active')
-      .or('subscription_status.eq.trial');
+      .or('subscription_status.eq.active,subscription_status.eq.trial');
 
     if (error) {
       console.error('Error fetching stores:', error);
       return NextResponse.json({ error: 'Failed to fetch stores' }, { status: 500 });
     }
 
-    // Also get trial stores
-    const { data: trialStores } = await supabase
-      .from('stores')
-      .select('id, shop_domain, sync_frequency')
-      .eq('subscription_status', 'trial');
-
-    const allStores = [...(stores || []), ...(trialStores || [])];
-
-    // Filter by sync frequency (default to daily if not set)
-    const storesToSync = allStores.filter(store => {
+    // Filter by sync frequency
+    const storesToSync = (stores || []).filter(store => {
       const storeFrequency = store.sync_frequency || 'daily';
       if (frequency === 'hourly') {
         return storeFrequency === 'hourly';
       }
-      // Daily cron syncs both daily and hourly (in case hourly was missed)
       return storeFrequency === 'daily' || storeFrequency === 'hourly';
     });
 
     console.log(`[Cron] Syncing ${storesToSync.length} stores (frequency: ${frequency})`);
 
-    const results: { store_id: string; success: boolean; error?: string }[] = [];
-
-    // Get base URL from request or environment
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+    const results: { store_id: string; shop_domain: string; success: boolean; error?: string; synced?: number }[] = [];
 
     for (const store of storesToSync) {
       try {
-        // Call the sync endpoint internally
-        const syncResponse = await fetch(`${baseUrl}/api/sync/orders`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            store_id: store.id,
-            days: 7, // Sync last 7 days
-          }),
-        });
+        // Call sync logic directly (no HTTP request)
+        const syncResult = await syncStoreOrders(store.id, 7);
 
-        const responseText = await syncResponse.text();
-        let responseData;
-        try {
-          responseData = JSON.parse(responseText);
-        } catch {
-          responseData = { error: responseText || 'Empty response' };
-        }
-
-        if (syncResponse.ok) {
-          results.push({ store_id: store.id, success: true });
-          console.log(`[Cron] Synced store ${store.shop_domain}`);
+        if (syncResult.success) {
+          const totalSynced = Object.values(syncResult.results || {}).reduce(
+            (sum: number, r: any) => sum + (r.synced || 0), 0
+          );
+          results.push({ store_id: store.id, shop_domain: store.shop_domain, success: true, synced: totalSynced });
+          console.log(`[Cron] Synced store ${store.shop_domain}: ${totalSynced} orders`);
         } else {
-          results.push({ store_id: store.id, success: false, error: responseData.error || 'Unknown error' });
-          console.error(`[Cron] Failed to sync ${store.shop_domain}:`, responseData.error);
+          results.push({ store_id: store.id, shop_domain: store.shop_domain, success: false, error: syncResult.error });
+          console.error(`[Cron] Failed to sync ${store.shop_domain}:`, syncResult.error);
         }
       } catch (err: any) {
-        results.push({ store_id: store.id, success: false, error: err.message });
+        results.push({ store_id: store.id, shop_domain: store.shop_domain, success: false, error: err.message });
         console.error(`[Cron] Error syncing ${store.shop_domain}:`, err.message);
       }
     }
