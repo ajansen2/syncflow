@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AdWyse - Ad Attribution & ROAS Tracking for Shopify",
-  description: "Track which Facebook, Google, and TikTok ads drive your Shopify sales. Real-time attribution, ROAS calculations, and AI-powered campaign insights.",
-  keywords: "ad attribution, ROAS tracking, shopify analytics, facebook ads, google ads, tiktok ads, ecommerce attribution",
+  title: "SyncFlow - Multi-Channel Order Sync for Shopify",
+  description: "Sync orders from Amazon, Etsy & Shopify in one dashboard. Unified order management, fee tracking, and payout reconciliation for multi-channel sellers.",
+  keywords: "multi-channel, order sync, shopify app, amazon seller, etsy seller, ecommerce, bookkeeping, reconciliation",
 };
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY || '08fa8bc27e0e3ac857912c7e7ee289d0';
+  const apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY || 'ebcd49739472f025754a6afcc20bf66d';
   
   return (
     <html lang="en">
