@@ -8,11 +8,20 @@ import { createClient } from '@supabase/supabase-js';
 let supabaseInstance: ReturnType<typeof createClient> | null = null;
 
 export function getSupabaseClient() {
+  if (typeof window === 'undefined') {
+    // During SSR/build, return a dummy that won't be used
+    return null as any;
+  }
+
   if (!supabaseInstance) {
-    supabaseInstance = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !key) {
+      throw new Error('Supabase credentials not configured');
+    }
+
+    supabaseInstance = createClient(url, key);
   }
   return supabaseInstance;
 }
