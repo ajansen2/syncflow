@@ -116,7 +116,7 @@ async function syncShopifyOrders(supabase: any, storeId: string, connection: any
     .single();
 
   let synced = 0;
-  let pageInfo = null;
+  let pageInfo: string | null = null;
   let hasNextPage = true;
 
   while (hasNextPage) {
