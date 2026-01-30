@@ -36,6 +36,7 @@ interface Order {
   order_date: string;
   gross_revenue: number;
   platform_fees: number;
+  payment_processing_fee: number;
   shipping_cost: number;
   net_revenue: number;
   currency: string;
@@ -106,7 +107,7 @@ function DashboardContent() {
       }
       metrics[order.platform].orders_count += 1;
       metrics[order.platform].gross_revenue += order.gross_revenue;
-      metrics[order.platform].total_fees += order.platform_fees + order.shipping_cost;
+      metrics[order.platform].total_fees += order.platform_fees + order.payment_processing_fee + order.shipping_cost;
       metrics[order.platform].net_revenue += order.net_revenue;
     });
 
@@ -118,7 +119,7 @@ function DashboardContent() {
     return {
       orders: filteredOrders.length,
       grossRevenue: filteredOrders.reduce((sum, o) => sum + o.gross_revenue, 0),
-      totalFees: filteredOrders.reduce((sum, o) => sum + o.platform_fees + o.shipping_cost, 0),
+      totalFees: filteredOrders.reduce((sum, o) => sum + o.platform_fees + o.payment_processing_fee + o.shipping_cost, 0),
       netRevenue: filteredOrders.reduce((sum, o) => sum + o.net_revenue, 0)
     };
   }, [filteredOrders]);
@@ -607,7 +608,7 @@ function DashboardContent() {
                         {getPlatformIcon(order.platform)}
                       </div>
                       <div>
-                        <div className="text-white font-medium">#{order.order_number}</div>
+                        <div className="text-white font-medium">{order.order_number}</div>
                         <div className="text-white/40 text-sm">
                           {new Date(order.order_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                         </div>
@@ -616,7 +617,7 @@ function DashboardContent() {
                     <div className="text-right">
                       <div className="text-white font-bold">${order.gross_revenue.toFixed(2)}</div>
                       <div className="text-red-400/80 text-sm">
-                        -${(order.platform_fees + order.shipping_cost).toFixed(2)} fees
+                        -${(order.platform_fees + order.payment_processing_fee + order.shipping_cost).toFixed(2)} fees
                       </div>
                     </div>
                   </div>
