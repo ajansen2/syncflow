@@ -43,8 +43,9 @@ export async function GET(request: NextRequest) {
       'read_products',
     ].join(',');
 
-    // Hardcode redirect URL to match Shopify Partner Dashboard exactly
-    const redirectUri = 'https://syncflow-blush.vercel.app/api/auth/shopify/callback';
+    // Use environment variable for redirect URL (must match Shopify Partner Dashboard)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://syncflow-blush.vercel.app';
+    const redirectUri = `${appUrl}/api/auth/shopify/callback`;
 
     // Use SHOPIFY_API_KEY (same as callback route)
     const clientId = process.env.SHOPIFY_API_KEY;
