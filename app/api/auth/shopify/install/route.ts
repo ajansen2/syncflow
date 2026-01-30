@@ -36,24 +36,22 @@ export async function GET(request: NextRequest) {
     // Generate state parameter for OAuth security
     const state = crypto.randomBytes(32).toString('hex');
 
-    // Scopes we need for cart recovery
+    // Scopes needed for order syncing
     const scopes = [
-      'read_checkouts',          // Read abandoned checkouts
-      'read_customers',          // Read customer info (email, name)
-      'read_orders',             // Track recovered orders
+      'read_orders',
+      'read_customers',
+      'read_products',
     ].join(',');
 
-    // Get app URL from environment or construct from request
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${request.headers.get('host')}`;
-    const redirectUri = `${appUrl}/api/auth/shopify/callback`;
+    // Hardcode redirect URL to match Shopify Partner Dashboard exactly
+    const redirectUri = 'https://syncflow-blush.vercel.app/api/auth/shopify/callback';
 
-    // Use PRODUCTION credentials (for App Store submission), fallback to hardcoded
-    const clientId = process.env.SHOPIFY_CLIENT_ID_PRODUCTION || process.env.SHOPIFY_CLIENT_ID_DEV || '08fa8bc27e0e3ac857912c7e7ee289d0';
+    // Use SHOPIFY_API_KEY (same as callback route)
+    const clientId = process.env.SHOPIFY_API_KEY;
 
     console.log('🚀 Starting OAuth for shop:', shop);
-    console.log('📍 App URL:', appUrl);
     console.log('📍 Redirect URI:', redirectUri);
-    console.log('🔑 Client ID:', clientId ? 'Found' : 'MISSING!');
+    console.log('🔑 Client ID:', clientId ? clientId.substring(0, 8) + '...' : 'MISSING!');
 
     // Safety check
     if (!clientId) {
