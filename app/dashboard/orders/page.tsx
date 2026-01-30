@@ -148,11 +148,13 @@ function OrdersContent() {
       'Status'
     ];
 
-    const rows = filteredOrders.map(order => [
+    const rows = filteredOrders.map(order => {
+      const platformName = order.platform.charAt(0).toUpperCase() + order.platform.slice(1);
+      return [
       new Date(order.order_date).toISOString().split('T')[0], // YYYY-MM-DD format
       order.order_number || order.platform_order_id,
-      `${order.platform} Order ${order.order_number}`,
-      order.platform,
+      `${platformName} Order ${order.order_number || order.platform_order_id}`,
+      platformName,
       order.gross_revenue.toFixed(2),
       order.shipping_revenue.toFixed(2),
       order.tax_collected.toFixed(2),
@@ -162,7 +164,7 @@ function OrdersContent() {
       order.net_revenue.toFixed(2),
       order.currency,
       order.financial_status || 'completed'
-    ]);
+    ]});
 
     const csvContent = [
       headers.join(','),
@@ -325,7 +327,7 @@ function OrdersContent() {
                     return (
                       <tr key={order.id} className="hover:bg-white/5 transition">
                         <td className="px-6 py-4">
-                          <div className="text-white font-medium">#{order.order_number || order.platform_order_id}</div>
+                          <div className="text-white font-medium">{order.order_number || `#${order.platform_order_id}`}</div>
                           <div className="text-white/40 text-xs">{order.platform_order_id}</div>
                         </td>
                         <td className="px-6 py-4">
