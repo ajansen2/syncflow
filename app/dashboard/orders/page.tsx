@@ -185,7 +185,7 @@ function OrdersContent() {
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-white/10">
             <Link href="/" className="flex items-center gap-3">
-              <img src="/logo.png" alt="SyncFlow" className="w-10 h-10" />
+              <img src="/channelsync.jpg" alt="SyncFlow" className="w-10 h-10 rounded-xl" />
               <span className="text-2xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
                 SyncFlow
               </span>
