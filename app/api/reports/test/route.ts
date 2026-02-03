@@ -13,21 +13,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email required' }, { status: 400 });
     }
 
-    // Generate test report data
+    // Generate test report data for SyncFlow
     const testData = {
       storeName: storeName || 'Test Store',
       shopDomain: shopDomain || '',
       dateRange: 'Last 7 days (Test)',
-      totalOrders: 42,
-      totalRevenue: 3250.00,
-      attributedOrders: 28,
-      attributedRevenue: 2150.00,
-      totalSpend: 450.00,
-      roas: 4.78,
-      topCampaigns: [
-        { name: 'Summer Sale Campaign', platform: 'Facebook', spend: 200, revenue: 1200, roas: 6.0 },
-        { name: 'Retargeting - Cart Abandoners', platform: 'Facebook', spend: 150, revenue: 650, roas: 4.33 },
-        { name: 'Brand Awareness', platform: 'TikTok', spend: 100, revenue: 300, roas: 3.0 },
+      totalOrders: 47,
+      grossRevenue: 14583.19,
+      totalFees: 716.08,
+      netRevenue: 13867.11,
+      channels: [
+        { name: 'Shopify', orders: 25, revenue: 8250.00, fees: 412.50 },
+        { name: 'Amazon', orders: 15, revenue: 4533.19, fees: 226.66 },
+        { name: 'Etsy', orders: 7, revenue: 1800.00, fees: 76.92 },
       ],
     };
 
