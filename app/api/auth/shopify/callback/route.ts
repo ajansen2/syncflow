@@ -214,6 +214,7 @@ export async function GET(request: NextRequest) {
     const returnUrl = `https://admin.shopify.com/store/${shopName}/apps/${apiKey}`;
 
     // First check for existing active charges
+    console.log('💰 Checking for existing charges...');
     const existingChargesResponse = await fetch(`https://${shop}/admin/api/2024-10/recurring_application_charges.json`, {
       headers: { 'X-Shopify-Access-Token': accessToken },
     });
@@ -221,13 +222,17 @@ export async function GET(request: NextRequest) {
     let hasActiveCharge = false;
     if (existingChargesResponse.ok) {
       const existingCharges = await existingChargesResponse.json();
+      console.log('💰 Existing charges:', JSON.stringify(existingCharges.recurring_application_charges?.map((c: any) => ({ id: c.id, status: c.status, name: c.name }))));
+
       const activeCharge = existingCharges.recurring_application_charges?.find(
-        (c: any) => c.status === 'active' || c.status === 'accepted'
+        (c: any) => c.status === 'active'
       );
       if (activeCharge) {
-        console.log('✅ Already has active billing charge:', activeCharge.id);
+        console.log('✅ Already has active billing charge:', activeCharge.id, activeCharge.status);
         hasActiveCharge = true;
       }
+    } else {
+      console.log('💰 Failed to fetch existing charges:', existingChargesResponse.status);
     }
 
     // Only create new charge if no active one exists
