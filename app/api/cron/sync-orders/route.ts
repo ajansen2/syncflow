@@ -23,11 +23,13 @@ export async function GET(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Get all stores (active or trial)
+    // Get all stores (active or trial) with valid access tokens
     const { data: stores, error } = await supabase
       .from('stores')
-      .select('id, shop_domain, sync_frequency')
-      .or('subscription_status.eq.active,subscription_status.eq.trial');
+      .select('id, shop_domain, sync_frequency, access_token')
+      .or('subscription_status.eq.active,subscription_status.eq.trial')
+      .neq('access_token', 'revoked')
+      .not('access_token', 'is', null);
 
     if (error) {
       console.error('Error fetching stores:', error);

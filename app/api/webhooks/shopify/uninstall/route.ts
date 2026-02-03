@@ -56,6 +56,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update store' }, { status: 500 });
     }
 
+    // Also revoke channel connection tokens
+    const { error: channelError } = await supabase
+      .from('channel_connections')
+      .update({
+        access_token: 'revoked',
+        is_active: false,
+        updated_at: new Date().toISOString()
+      })
+      .in('store_id', storeIds)
+      .eq('platform', 'shopify');
+
+    if (channelError) {
+      console.error('❌ Error revoking channel connections:', channelError);
+    }
+
     console.log('✅ Store(s) marked as cancelled:', shop, `(${storeIds.length} stores)`);
 
     return NextResponse.json({ success: true }, { status: 200 });

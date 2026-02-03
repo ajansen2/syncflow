@@ -169,6 +169,22 @@ export async function GET(request: NextRequest) {
     // Register webhooks for order syncing
     const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/shopify`;
 
+    // First, delete any existing webhooks to avoid duplicates
+    const existingWebhooksResponse = await fetch(`https://${shop}/admin/api/2024-10/webhooks.json`, {
+      headers: { 'X-Shopify-Access-Token': accessToken },
+    });
+
+    if (existingWebhooksResponse.ok) {
+      const existingWebhooks = await existingWebhooksResponse.json();
+      for (const webhook of existingWebhooks.webhooks || []) {
+        await fetch(`https://${shop}/admin/api/2024-10/webhooks/${webhook.id}.json`, {
+          method: 'DELETE',
+          headers: { 'X-Shopify-Access-Token': accessToken },
+        });
+      }
+      console.log('🗑️ Deleted', existingWebhooks.webhooks?.length || 0, 'old webhooks');
+    }
+
     const webhookTopics = [
       { topic: 'orders/create', address: `${webhookUrl}/orders` },
       { topic: 'orders/updated', address: `${webhookUrl}/orders` },
@@ -177,7 +193,7 @@ export async function GET(request: NextRequest) {
     ];
 
     for (const webhook of webhookTopics) {
-      await fetch(`https://${shop}/admin/api/2024-10/webhooks.json`, {
+      const result = await fetch(`https://${shop}/admin/api/2024-10/webhooks.json`, {
         method: 'POST',
         headers: {
           'X-Shopify-Access-Token': accessToken,
@@ -185,6 +201,9 @@ export async function GET(request: NextRequest) {
         },
         body: JSON.stringify({ webhook: { ...webhook, format: 'json' } }),
       });
+      if (!result.ok) {
+        console.error('❌ Failed to register webhook:', webhook.topic, await result.text());
+      }
     }
 
     console.log('✅ Webhooks registered');
