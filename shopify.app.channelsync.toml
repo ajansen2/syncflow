@@ -1,9 +1,9 @@
-# ChannelSync Shopify App Configuration
+# SyncFlow Shopify App Configuration
 # Use with: shopify app dev --config shopify.app.channelsync.toml
 
-name = "ChannelSync"
+name = "SyncFlow"
 client_id = "YOUR_CLIENT_ID_HERE"
-application_url = "https://channelsync.vercel.app"
+application_url = "https://syncflow-blush.vercel.app"
 embedded = true
 
 [access_scopes]
@@ -11,7 +11,7 @@ scopes = "read_orders,read_products"
 
 [auth]
 redirect_urls = [
-  "https://channelsync.vercel.app/api/auth/shopify/callback",
+  "https://syncflow-blush.vercel.app/api/auth/shopify/callback",
   "https://localhost:3000/api/auth/shopify/callback"
 ]
 
