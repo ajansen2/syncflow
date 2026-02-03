@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     // Generate test report data for SyncFlow
     const testData = {
       storeName: storeName || 'Test Store',
-      shopDomain: shopDomain || '',
+      shopDomain: shopDomain || 'argora-test.myshopify.com',
       dateRange: 'Last 7 days (Test)',
       totalOrders: 47,
       grossRevenue: 14583.19,
