@@ -194,35 +194,62 @@ export async function GET(request: NextRequest) {
     const shopName = shop.replace('.myshopify.com', '');
     const returnUrl = `https://admin.shopify.com/store/${shopName}/apps/${apiKey}`;
 
-    const chargeResponse = await fetch(`https://${shop}/admin/api/2024-10/recurring_application_charges.json`, {
-      method: 'POST',
-      headers: {
-        'X-Shopify-Access-Token': accessToken,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        recurring_application_charge: {
-          name: 'ChannelSync - All Channels',
-          price: 29.00,
-          trial_days: 14,
-          return_url: returnUrl,
-          ...(isTestCharge && { test: true }),
-        }
-      })
+    // First check for existing active charges
+    const existingChargesResponse = await fetch(`https://${shop}/admin/api/2024-10/recurring_application_charges.json`, {
+      headers: { 'X-Shopify-Access-Token': accessToken },
     });
 
-    if (chargeResponse.ok) {
-      const chargeData = await chargeResponse.json();
-      const confirmationUrl = chargeData.recurring_application_charge.confirmation_url;
-
-      console.log('✅ Billing charge created');
-
-      const response = NextResponse.redirect(confirmationUrl);
-      response.cookies.delete('shopify_oauth_state');
-      return response;
+    let hasActiveCharge = false;
+    if (existingChargesResponse.ok) {
+      const existingCharges = await existingChargesResponse.json();
+      const activeCharge = existingCharges.recurring_application_charges?.find(
+        (c: any) => c.status === 'active' || c.status === 'accepted'
+      );
+      if (activeCharge) {
+        console.log('✅ Already has active billing charge:', activeCharge.id);
+        hasActiveCharge = true;
+      }
     }
 
-    // Fallback to dashboard if billing fails
+    // Only create new charge if no active one exists
+    if (!hasActiveCharge) {
+      console.log('💰 Creating new billing charge...');
+      const chargeResponse = await fetch(`https://${shop}/admin/api/2024-10/recurring_application_charges.json`, {
+        method: 'POST',
+        headers: {
+          'X-Shopify-Access-Token': accessToken,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recurring_application_charge: {
+            name: 'SyncFlow - All Channels',
+            price: 29.00,
+            trial_days: 14,
+            return_url: returnUrl,
+            ...(isTestCharge && { test: true }),
+          }
+        })
+      });
+
+      console.log('💰 Billing response status:', chargeResponse.status);
+
+      if (chargeResponse.ok) {
+        const chargeData = await chargeResponse.json();
+        const confirmationUrl = chargeData.recurring_application_charge.confirmation_url;
+
+        console.log('✅ Billing charge created, redirecting to:', confirmationUrl);
+
+        const response = NextResponse.redirect(confirmationUrl);
+        response.cookies.delete('shopify_oauth_state');
+        return response;
+      } else {
+        const errorText = await chargeResponse.text();
+        console.error('❌ Billing charge failed:', chargeResponse.status, errorText);
+      }
+    }
+
+    // Go to dashboard if already has active charge or billing creation fails
+    console.log('📍 Redirecting to dashboard');
     const response = NextResponse.redirect(`https://admin.shopify.com/store/${shopName}/apps/${apiKey}?shop=${shop}`);
     response.cookies.delete('shopify_oauth_state');
     return response;
