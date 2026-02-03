@@ -598,7 +598,7 @@ function DashboardContent() {
                           </div>
                           <div>
                             <div className="text-white/40 text-xs">Revenue</div>
-                            <div className="text-white font-medium">${metrics.net_revenue.toFixed(0)}</div>
+                            <div className="text-white font-medium">${metrics.gross_revenue.toFixed(0)}</div>
                           </div>
                         </div>
                       )}
