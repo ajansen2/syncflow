@@ -158,6 +158,28 @@ function DashboardContent() {
             const data = JSON.parse(xhr.responseText);
             if (data.store) {
               setStore(data.store);
+
+              // Check billing status (skip if just returned from billing approval)
+              const billingParam = searchParams.get('billing');
+              if (billingParam !== 'success') {
+                setLoadingMessage('Checking subscription...');
+                const billingResponse = await fetch('/api/billing/check', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ shop })
+                });
+
+                if (billingResponse.ok) {
+                  const billingData = await billingResponse.json();
+                  if (billingData.needsBilling && billingData.confirmationUrl) {
+                    console.log('Redirecting to billing:', billingData.confirmationUrl);
+                    // Use redirectToOAuth to break out of iframe
+                    redirectToOAuth(billingData.confirmationUrl);
+                    return; // Don't continue loading
+                  }
+                }
+              }
+
               await loadChannelsAndOrders(data.store.id);
             }
           } else if (xhr.status === 404) {
@@ -170,6 +192,23 @@ function DashboardContent() {
             if (installResponse.ok) {
               const installData = await installResponse.json();
               setStore(installData.store);
+
+              // Check billing for new installs too
+              setLoadingMessage('Setting up subscription...');
+              const billingResponse = await fetch('/api/billing/check', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ shop })
+              });
+
+              if (billingResponse.ok) {
+                const billingData = await billingResponse.json();
+                if (billingData.needsBilling && billingData.confirmationUrl) {
+                  console.log('Redirecting to billing:', billingData.confirmationUrl);
+                  redirectToOAuth(billingData.confirmationUrl);
+                  return;
+                }
+              }
             }
           }
         } catch (error) {
