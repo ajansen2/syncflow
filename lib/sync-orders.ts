@@ -100,14 +100,24 @@ export async function syncStoreOrders(storeId: string, days: number = 30, platfo
 }
 
 async function syncShopifyOrders(supabase: any, storeId: string, connection: any, startDate: Date) {
+  console.log('🔄 Starting Shopify sync for store:', storeId);
+  console.log('🔑 Access token length:', connection.access_token?.length || 0);
+
   // Get store for shop domain
-  const { data: store } = await supabase
+  const { data: store, error: storeError } = await supabase
     .from('stores')
     .select('shop_domain')
     .eq('id', storeId)
     .single();
 
-  if (!store) return 0;
+  if (storeError) {
+    console.error('❌ Error fetching store:', storeError);
+    return 0;
+  }
+  if (!store) {
+    console.error('❌ Store not found for ID:', storeId);
+    return 0;
+  }
 
   const shopDomain: string = store.shop_domain;
   let synced = 0;
@@ -119,13 +129,22 @@ async function syncShopifyOrders(supabase: any, storeId: string, connection: any
       ? `https://${shopDomain}/admin/api/2024-10/orders.json?limit=250&page_info=${pageInfo}`
       : `https://${shopDomain}/admin/api/2024-10/orders.json?limit=250&created_at_min=${startDate.toISOString()}&status=any`;
 
+    console.log('📡 Fetching from Shopify:', url);
+
     const response = await fetch(url, {
       headers: { 'X-Shopify-Access-Token': connection.access_token },
     });
 
-    if (!response.ok) break;
+    console.log('📡 Shopify response status:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Shopify API error:', response.status, errorText);
+      break;
+    }
 
     const data = await response.json();
+    console.log('📦 Shopify returned', data.orders?.length || 0, 'orders');
 
     for (const order of data.orders || []) {
       // Calculate fees

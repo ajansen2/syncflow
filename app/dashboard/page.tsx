@@ -215,11 +215,18 @@ function DashboardContent() {
         body: JSON.stringify({ storeId: store.id })
       });
 
+      const data = await response.json();
+
       if (response.ok) {
+        console.log('✅ Sync completed:', data);
         await loadChannelsAndOrders(store.id);
+      } else {
+        console.error('❌ Sync failed:', data);
+        alert(`Sync failed: ${data.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Sync error:', error);
+      alert('Sync failed - check console for details');
     } finally {
       setSyncing(false);
     }
