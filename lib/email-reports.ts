@@ -164,6 +164,7 @@ export async function sendReportEmail(
   html: string
 ): Promise<boolean> {
   const resendApiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'reports@send.argora.ai';
 
   if (!resendApiKey) {
     console.error('RESEND_API_KEY not configured');
@@ -178,7 +179,7 @@ export async function sendReportEmail(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'SyncFlow <reports@send.syncflow.ca>',
+        from: `SyncFlow <${fromEmail}>`,
         to: [to],
         subject: subject,
         html: html,
