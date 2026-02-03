@@ -247,7 +247,7 @@ export async function GET(request: NextRequest) {
         body: JSON.stringify({
           recurring_application_charge: {
             name: 'SyncFlow - All Channels',
-            price: 29.00,
+            price: 29.99,
             trial_days: 14,
             return_url: returnUrl,
             ...(isTestCharge && { test: true }),
