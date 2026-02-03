@@ -395,7 +395,16 @@ function DashboardContent() {
 
           {store && (
             <div className="p-4 border-t border-white/10">
-              <div className="text-white font-medium truncate">{store.store_name}</div>
+              <div className="flex items-center justify-between mb-1">
+                <div className="text-white font-medium truncate">{store.store_name}</div>
+                <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
+                  store.subscription_status === 'active'
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                }`}>
+                  {store.subscription_status === 'active' ? 'Pro' : 'Trial'}
+                </span>
+              </div>
               <div className="text-white/40 text-sm truncate">{store.shop_domain}</div>
             </div>
           )}
