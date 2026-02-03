@@ -32,11 +32,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Store not found' }, { status: 404 });
     }
 
-    if (!store.access_token || store.access_token === 'revoked') {
-      console.log('❌ No valid access token for billing check');
+    if (!store.access_token || store.access_token === 'revoked' || store.access_token === '') {
+      console.log('❌ No valid access token - need OAuth');
+      // Need to re-authorize - return OAuth URL
+      const apiKey = process.env.SHOPIFY_API_KEY;
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://syncflow-blush.vercel.app';
+      const oauthUrl = `${appUrl}/api/auth/shopify/install?shop=${shop}`;
       return NextResponse.json({
-        needsBilling: false,
-        error: 'No valid access token - please reinstall app'
+        needsOAuth: true,
+        oauthUrl
       });
     }
 
@@ -48,6 +52,16 @@ export async function POST(request: NextRequest) {
 
     if (!chargesResponse.ok) {
       console.error('Failed to fetch charges:', chargesResponse.status);
+      // Token might be invalid - need to re-authorize
+      if (chargesResponse.status === 401) {
+        const apiKey = process.env.SHOPIFY_API_KEY;
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://syncflow-blush.vercel.app';
+        const oauthUrl = `${appUrl}/api/auth/shopify/install?shop=${shop}`;
+        return NextResponse.json({
+          needsOAuth: true,
+          oauthUrl
+        });
+      }
       return NextResponse.json({ needsBilling: false });
     }
 

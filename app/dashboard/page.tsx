@@ -171,11 +171,20 @@ function DashboardContent() {
 
                 if (billingResponse.ok) {
                   const billingData = await billingResponse.json();
+
+                  // Need to re-authorize (token invalid)
+                  if (billingData.needsOAuth && billingData.oauthUrl) {
+                    console.log('Redirecting to OAuth:', billingData.oauthUrl);
+                    setLoadingMessage('Reconnecting to Shopify...');
+                    redirectToOAuth(billingData.oauthUrl);
+                    return;
+                  }
+
+                  // Need billing approval
                   if (billingData.needsBilling && billingData.confirmationUrl) {
                     console.log('Redirecting to billing:', billingData.confirmationUrl);
-                    // Use redirectToOAuth to break out of iframe
                     redirectToOAuth(billingData.confirmationUrl);
-                    return; // Don't continue loading
+                    return;
                   }
                 }
               }
@@ -203,6 +212,14 @@ function DashboardContent() {
 
               if (billingResponse.ok) {
                 const billingData = await billingResponse.json();
+
+                if (billingData.needsOAuth && billingData.oauthUrl) {
+                  console.log('Redirecting to OAuth:', billingData.oauthUrl);
+                  setLoadingMessage('Connecting to Shopify...');
+                  redirectToOAuth(billingData.oauthUrl);
+                  return;
+                }
+
                 if (billingData.needsBilling && billingData.confirmationUrl) {
                   console.log('Redirecting to billing:', billingData.confirmationUrl);
                   redirectToOAuth(billingData.confirmationUrl);
