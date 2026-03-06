@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/sync-orders?frequency=daily",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/check-subscriptions",
+      "schedule": "0 0 * * *"
     }
   ]
 }

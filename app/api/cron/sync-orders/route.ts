@@ -23,11 +23,12 @@ export async function GET(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Get all stores (active or trial) with valid access tokens
+    // Get all stores with valid subscriptions (active or valid trial)
+    const now = new Date().toISOString();
     const { data: stores, error } = await supabase
       .from('stores')
-      .select('id, shop_domain, sync_frequency, access_token')
-      .or('subscription_status.eq.active,subscription_status.eq.trial')
+      .select('id, shop_domain, sync_frequency, access_token, subscription_status, trial_ends_at')
+      .or(`subscription_status.eq.active,and(subscription_status.eq.trial,trial_ends_at.gt.${now})`)
       .neq('access_token', 'revoked')
       .not('access_token', 'is', null);
 

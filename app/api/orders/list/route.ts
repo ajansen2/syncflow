@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireActiveSubscription } from '@/lib/check-subscription';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,6 +9,12 @@ export async function GET(request: NextRequest) {
 
     if (!merchantId) {
       return NextResponse.json({ error: 'Merchant ID required' }, { status: 400 });
+    }
+
+    // Check subscription status
+    const subscriptionCheck = await requireActiveSubscription(merchantId);
+    if ('error' in subscriptionCheck) {
+      return subscriptionCheck.error;
     }
 
     // Use service role to bypass RLS
