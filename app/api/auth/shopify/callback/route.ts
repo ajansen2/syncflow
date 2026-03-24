@@ -190,6 +190,7 @@ export async function GET(request: NextRequest) {
       { topic: 'orders/updated', address: `${webhookUrl}/orders` },
       { topic: 'refunds/create', address: `${webhookUrl}/refunds` },
       { topic: 'app/uninstalled', address: `${webhookUrl}/uninstall` },
+      { topic: 'app_subscriptions/update', address: `${webhookUrl}/subscription` },
     ];
 
     for (const webhook of webhookTopics) {
@@ -209,9 +210,10 @@ export async function GET(request: NextRequest) {
     console.log('✅ Webhooks registered');
 
     // Create billing charge ($29/month with 14-day trial)
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${request.headers.get('host')}`;
     const isTestCharge = shop.includes('-test') || shop.includes('development') || shop.includes('dev-');
     const shopName = shop.replace('.myshopify.com', '');
-    const returnUrl = `https://admin.shopify.com/store/${shopName}/apps/${apiKey}`;
+    const returnUrl = `${appUrl}/api/billing/callback?shop=${shop}&store_id=${store.id}`;
 
     // First check for existing active charges
     console.log('💰 Checking for existing charges...');
