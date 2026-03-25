@@ -100,9 +100,8 @@ export async function POST(request: NextRequest) {
     console.log('💰 Creating new billing charge...');
 
     const isTestCharge = shop.includes('-test') || shop.includes('development') || shop.includes('dev-');
-    const shopName = shop.replace('.myshopify.com', '');
-    const apiKey = process.env.SHOPIFY_API_KEY;
-    const returnUrl = `https://admin.shopify.com/store/${shopName}/apps/${apiKey}?billing=success`;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://syncflow-blush.vercel.app';
+    const returnUrl = `${appUrl}/api/billing/callback?shop=${shop}&store_id=${store.id}`;
 
     const createResponse = await fetch(
       `https://${shop}/admin/api/2024-10/recurring_application_charges.json`,
