@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import PricingCard from '@/components/ui/pricing-card';
 
 export default function PricingPage() {
   return (
@@ -19,80 +22,8 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Card */}
-        <div className="max-w-md mx-auto">
-          <div className="bg-white/10 backdrop-blur border-2 border-cyan-500/50 rounded-2xl p-8 text-center relative overflow-hidden">
-            <div className="absolute top-4 right-4 px-3 py-1 bg-cyan-500 text-white text-xs font-bold rounded-full">
-              SAVE $336/YR
-            </div>
-            <div className="inline-flex px-4 py-1 bg-cyan-500/20 rounded-full text-cyan-300 text-sm font-medium mb-4">
-              All Channels Included
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Pro Plan</h2>
-            <div className="mb-6">
-              <span className="text-5xl font-bold text-white">$29</span>
-              <span className="text-white/60">/month</span>
-            </div>
-            <div className="text-green-400 font-medium mb-6">14-day free trial included</div>
-
-            <ul className="text-left space-y-3 mb-8">
-              <li className="flex items-center gap-3 text-white/80">
-                <svg className="w-5 h-5 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Amazon order sync
-              </li>
-              <li className="flex items-center gap-3 text-white/80">
-                <svg className="w-5 h-5 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Shopify order sync
-              </li>
-              <li className="flex items-center gap-3 text-white/80">
-                <svg className="w-5 h-5 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Etsy order sync
-              </li>
-              <li className="flex items-center gap-3 text-white/80">
-                <svg className="w-5 h-5 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Unified dashboard
-              </li>
-              <li className="flex items-center gap-3 text-white/80">
-                <svg className="w-5 h-5 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Fee tracking & profit calculation
-              </li>
-              <li className="flex items-center gap-3 text-white/80">
-                <svg className="w-5 h-5 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Payout reconciliation
-              </li>
-              <li className="flex items-center gap-3 text-white/80">
-                <svg className="w-5 h-5 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Channel analytics
-              </li>
-              <li className="flex items-center gap-3 text-white/80">
-                <svg className="w-5 h-5 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                CSV export
-              </li>
-            </ul>
-
-            <Link
-              href="/dashboard"
-              className="block w-full py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-bold rounded-lg transition"
-            >
-              Start Free Trial
-            </Link>
-            <p className="text-white/40 text-sm mt-3">No credit card required</p>
-          </div>
+        <div className="flex justify-center">
+          <PricingCard />
         </div>
 
         {/* Comparison */}
