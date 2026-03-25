@@ -1,0 +1,37 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "ebcd49739472f025754a6afcc20bf66d"
+name = "SyncFlow"
+application_url = "https://syncflow-blush.vercel.app"
+embedded = true
+
+[webhooks]
+api_version = "2026-01"
+
+  [[webhooks.subscriptions]]
+  topics = ["orders/create", "orders/updated"]
+  uri = "https://syncflow-blush.vercel.app/api/webhooks/shopify/orders"
+
+  [[webhooks.subscriptions]]
+  topics = ["refunds/create"]
+  uri = "https://syncflow-blush.vercel.app/api/webhooks/shopify/refunds"
+
+  [[webhooks.subscriptions]]
+  topics = ["app/uninstalled"]
+  uri = "https://syncflow-blush.vercel.app/api/webhooks/shopify/uninstall"
+
+[webhooks.privacy_compliance]
+customer_data_request_url = "https://syncflow-blush.vercel.app/api/webhooks/customers/data-request"
+customer_deletion_url = "https://syncflow-blush.vercel.app/api/webhooks/customers/redact"
+shop_deletion_url = "https://syncflow-blush.vercel.app/api/webhooks/shop/redact"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_analytics,read_customers,read_inventory,read_orders,read_products,read_reports"
+optional_scopes = [ ]
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [
+  "https://syncflow-blush.vercel.app/api/auth/shopify/callback"
+]
