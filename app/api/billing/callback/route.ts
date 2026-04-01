@@ -4,7 +4,17 @@ import { createClient } from '@supabase/supabase-js';
 // Helper to build Shopify admin URL for embedded app redirect
 function buildShopifyAdminUrl(shop: string, params?: Record<string, string>): string {
   const shopName = shop.replace('.myshopify.com', '');
-  const baseUrl = `https://admin.shopify.com/store/${shopName}/apps/${process.env.SHOPIFY_API_KEY}`;
+  const apiKey = process.env.SHOPIFY_API_KEY;
+
+  if (!apiKey) {
+    console.error('❌ SHOPIFY_API_KEY is not set!');
+    // Fallback - this shouldn't happen in production
+    throw new Error('SHOPIFY_API_KEY environment variable is not set');
+  }
+
+  const baseUrl = `https://admin.shopify.com/store/${shopName}/apps/${apiKey}`;
+  console.log('🔗 Building Shopify admin URL:', baseUrl);
+
   if (params && Object.keys(params).length > 0) {
     const searchParams = new URLSearchParams(params);
     return `${baseUrl}?${searchParams.toString()}`;
