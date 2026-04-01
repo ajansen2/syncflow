@@ -497,7 +497,16 @@ function SettingsContent() {
             <p className="text-white/60 mb-4">
               Uninstalling will remove all data, disconnect your channels, and cancel your subscription.
             </p>
-            <button className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition">
+            <button
+              onClick={() => {
+                const shop = searchParams.get('shop') || store?.shop_domain;
+                if (shop) {
+                  const storeName = shop.replace('.myshopify.com', '');
+                  window.top?.location.assign(`https://admin.shopify.com/store/${storeName}/settings/apps?tab=installed`);
+                }
+              }}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition"
+            >
               Uninstall App
             </button>
           </div>
