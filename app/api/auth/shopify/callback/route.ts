@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
     let store;
 
     if (existingStore) {
-      const { data: updatedStore } = await supabase
+      const { data: updatedStore, error: updateError } = await supabase
         .from('stores')
         .update({
           access_token: accessToken,
@@ -104,9 +104,18 @@ export async function GET(request: NextRequest) {
         .select()
         .single();
 
+      if (updateError) {
+        console.error('❌ Store update failed:', updateError);
+        return NextResponse.json({
+          error: 'Failed to update store',
+          details: updateError.message
+        }, { status: 500 });
+      }
+
       store = updatedStore;
+      console.log('✅ Store updated:', store.id);
     } else {
-      const { data: newStore } = await supabase
+      const { data: newStore, error: insertError } = await supabase
         .from('stores')
         .insert({
           shop_domain: shop,
@@ -121,7 +130,23 @@ export async function GET(request: NextRequest) {
         .select()
         .single();
 
+      if (insertError) {
+        console.error('❌ Store creation failed:', insertError);
+        return NextResponse.json({
+          error: 'Failed to create store',
+          details: insertError.message
+        }, { status: 500 });
+      }
+
       store = newStore;
+      console.log('✅ Store created:', store.id);
+    }
+
+    if (!store) {
+      console.error('❌ Store is null after database operation');
+      return NextResponse.json({
+        error: 'Store operation returned null'
+      }, { status: 500 });
     }
 
     console.log('✅ Store ready:', store.id);

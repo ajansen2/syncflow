@@ -170,6 +170,30 @@ export function navigateInApp(path: string) {
   }
 }
 
+// Redirect to Shopify admin if app is opened standalone (not embedded)
+// This ensures the app is always loaded within Shopify's iframe
+export function redirectToShopifyAdmin(shop: string): boolean {
+  const isEmbedded = window.self !== window.top;
+
+  // If already embedded, no redirect needed
+  if (isEmbedded) {
+    return false;
+  }
+
+  // Get the Shopify API key (client ID)
+  const apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY || 'ebcd49739472f025754a6afcc20bf66d';
+
+  // Extract store name from shop domain (e.g., "argora-test" from "argora-test.myshopify.com")
+  const storeName = shop.replace('.myshopify.com', '');
+
+  // Build the Shopify admin URL
+  const adminUrl = `https://admin.shopify.com/store/${storeName}/apps/${apiKey}`;
+
+  console.log('🔄 Redirecting to Shopify admin:', adminUrl);
+  window.location.href = adminUrl;
+  return true;
+}
+
 // Redirect to external URL (like OAuth or billing) - breaks out of iframe as required
 export function redirectToOAuth(url: string) {
   const isEmbedded = window.self !== window.top;

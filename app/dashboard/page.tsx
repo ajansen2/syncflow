@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase-client';
-import { initializeAppBridge, isEmbeddedInShopify, navigateInApp, getShopifySessionToken, redirectToOAuth } from '@/lib/shopify-app-bridge';
+import { initializeAppBridge, isEmbeddedInShopify, navigateInApp, getShopifySessionToken, redirectToOAuth, redirectToShopifyAdmin } from '@/lib/shopify-app-bridge';
 import Link from 'next/link';
 
 type DateRangeOption = '7d' | '14d' | '30d' | '90d' | 'all';
@@ -169,12 +169,18 @@ function DashboardContent() {
   useEffect(() => {
     const loadData = async () => {
       const embedded = isEmbeddedInShopify();
+      const shop = searchParams.get('shop');
+
+      // If opened standalone with shop param, redirect to Shopify admin
+      if (!embedded && shop) {
+        redirectToShopifyAdmin(shop);
+        return;
+      }
 
       if (embedded) {
         initializeAppBridge();
         await getShopifySessionToken();
 
-        const shop = searchParams.get('shop');
         if (!shop) {
           setLoadError('Missing shop parameter');
           setLoading(false);
