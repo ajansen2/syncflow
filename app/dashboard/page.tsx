@@ -63,8 +63,37 @@ function DashboardContent() {
   const [dateRangeOption, setDateRangeOption] = useState<DateRangeOption>('30d');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(1);
 
   const router = useRouter();
+
+  // Calculate trial days left
+  const getTrialDaysLeft = () => {
+    if (!store?.trial_ends_at) return null;
+    const trialEnd = new Date(store.trial_ends_at);
+    const now = new Date();
+    const daysLeft = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(0, daysLeft);
+  };
+
+  // DISABLED: Onboarding tutorial - was showing too frequently
+  // Keeping the state but never showing it
+  useEffect(() => {
+    // Always mark as seen to prevent any chance of showing
+    if (store) {
+      localStorage.setItem(`channelsync_onboarding_${store.id}`, 'true');
+    }
+    // Never show onboarding - setShowOnboarding(false) is the default
+  }, [store]);
+
+  const completeOnboarding = () => {
+    if (store) {
+      localStorage.setItem(`channelsync_onboarding_${store.id}`, 'true');
+    }
+    setShowOnboarding(false);
+    setOnboardingStep(1);
+  };
   const searchParams = useSearchParams();
   const supabase = getSupabaseClient();
 
@@ -311,7 +340,7 @@ function DashboardContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-solid border-cyan-500 border-r-transparent mb-4"></div>
           <div className="text-white text-xl">{loadingMessage}</div>
@@ -322,7 +351,7 @@ function DashboardContent() {
 
   if (loadError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900 flex items-center justify-center p-6">
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6">
         <div className="max-w-lg w-full bg-red-500/10 border-2 border-red-500/50 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold text-white mb-3">Unable to Load Dashboard</h2>
           <p className="text-white/80 mb-6">{loadError}</p>
@@ -333,15 +362,104 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900">
+    <div className="min-h-screen bg-zinc-950">
+      {/* Onboarding Modal */}
+      {showOnboarding && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+            <div className="flex justify-center gap-2 mb-6">
+              {[1, 2, 3].map((step) => (
+                <div
+                  key={step}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    step === onboardingStep ? 'bg-cyan-500 w-6' : step < onboardingStep ? 'bg-cyan-500' : 'bg-zinc-700'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {onboardingStep === 1 && (
+              <div className="text-center">
+                <div className="w-16 h-16 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">🔗</span>
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">Welcome to SyncFlow!</h2>
+                <p className="text-zinc-400 mb-6">
+                  Consolidate all your sales channels (Amazon, Etsy, Shopify) in one dashboard with real profit tracking.
+                </p>
+              </div>
+            )}
+
+            {onboardingStep === 2 && (
+              <div className="text-center">
+                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">📊</span>
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">Connect Your Channels</h2>
+                <p className="text-zinc-400 mb-6">
+                  Link Amazon, Etsy, or additional Shopify stores. We automatically sync orders and calculate true profit after all fees.
+                </p>
+              </div>
+            )}
+
+            {onboardingStep === 3 && (
+              <div className="text-center">
+                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-3xl">💰</span>
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">See Your True Profit</h2>
+                <p className="text-zinc-400 mb-6">
+                  View gross revenue, platform fees, shipping costs, and net profit across all channels in real-time.
+                </p>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              {onboardingStep > 1 && (
+                <button
+                  onClick={() => setOnboardingStep(onboardingStep - 1)}
+                  className="flex-1 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium transition"
+                >
+                  Back
+                </button>
+              )}
+              {onboardingStep < 3 ? (
+                <button
+                  onClick={() => setOnboardingStep(onboardingStep + 1)}
+                  className="flex-1 px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl font-medium transition"
+                >
+                  Next
+                </button>
+              ) : (
+                <button
+                  onClick={completeOnboarding}
+                  className="flex-1 px-4 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl font-medium transition"
+                >
+                  Get Started
+                </button>
+              )}
+            </div>
+
+            {onboardingStep < 3 && (
+              <button
+                onClick={completeOnboarding}
+                className="w-full mt-3 text-zinc-500 hover:text-zinc-400 text-sm transition"
+              >
+                Skip tutorial
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 z-50 h-screen w-64 bg-slate-900/90 backdrop-blur border-r border-white/10 transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed top-0 left-0 z-50 h-screen w-64 bg-zinc-900 border-r border-zinc-800 transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex flex-col h-full">
-          <div className="p-6 border-b border-white/10">
+          <div className="p-6 border-b border-zinc-800">
             <Link href="/" className="flex items-center gap-3">
               <img src="/channelsync.jpg" alt="SyncFlow" className="w-10 h-10 rounded-xl" />
               <span className="text-2xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
@@ -363,7 +481,7 @@ function DashboardContent() {
 
             <button
               onClick={() => navigateInApp('/dashboard/orders')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:bg-white/5 hover:text-white transition"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:bg-zinc-900/50 hover:text-white transition"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -373,7 +491,7 @@ function DashboardContent() {
 
             <button
               onClick={() => navigateInApp('/dashboard/channels')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:bg-white/5 hover:text-white transition"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:bg-zinc-900/50 hover:text-white transition"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
@@ -383,7 +501,7 @@ function DashboardContent() {
 
             <button
               onClick={() => navigateInApp('/dashboard/settings')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:bg-white/5 hover:text-white transition"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-white/60 hover:bg-zinc-900/50 hover:text-white transition"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -394,7 +512,7 @@ function DashboardContent() {
           </nav>
 
           {store && (
-            <div className="p-4 border-t border-white/10">
+            <div className="p-4 border-t border-zinc-800">
               <div className="flex items-center justify-between mb-1">
                 <div className="text-white font-medium truncate">{store.store_name}</div>
                 <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${
@@ -413,7 +531,7 @@ function DashboardContent() {
 
       {/* Main Content */}
       <main className="lg:ml-64 min-h-screen">
-        <header className="bg-slate-900/50 backdrop-blur border-b border-white/10 sticky top-0 z-30">
+        <header className="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-30">
           <div className="px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden text-white">
@@ -428,7 +546,7 @@ function DashboardContent() {
               <div className="relative">
                 <button
                   onClick={() => setShowDatePicker(!showDatePicker)}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm font-medium transition"
+                  className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm font-medium transition"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -439,7 +557,7 @@ function DashboardContent() {
                 {showDatePicker && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowDatePicker(false)} />
-                    <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-white/20 rounded-xl shadow-xl z-50 overflow-hidden">
+                    <div className="absolute right-0 mt-2 w-48 bg-zinc-800 border border-zinc-700 rounded-xl shadow-xl z-50 overflow-hidden">
                       {['7d', '14d', '30d', '90d', 'all'].map((option) => (
                         <button
                           key={option}
@@ -448,7 +566,7 @@ function DashboardContent() {
                             setShowDatePicker(false);
                           }}
                           className={`w-full text-left px-4 py-2 text-sm transition ${
-                            dateRangeOption === option ? 'bg-cyan-600 text-white' : 'text-white/80 hover:bg-white/10'
+                            dateRangeOption === option ? 'bg-cyan-600 text-white' : 'text-white/80 hover:bg-zinc-800'
                           }`}
                         >
                           {option === 'all' ? 'All time' : `Last ${option.replace('d', '')} days`}
@@ -478,6 +596,42 @@ function DashboardContent() {
                   </>
                 )}
               </button>
+
+              {/* Help Button */}
+              <button
+                onClick={() => setShowOnboarding(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-lg text-zinc-300 text-sm font-medium transition"
+                title="Quick Start Guide"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Help
+              </button>
+
+              {/* Trial Badge */}
+              {(() => {
+                const trialDays = getTrialDaysLeft();
+                if (store?.subscription_status === 'active') {
+                  return (
+                    <span className="px-3 py-1 bg-green-600/20 border border-green-500/30 rounded-full text-green-300 text-sm font-medium">
+                      Pro Plan
+                    </span>
+                  );
+                }
+                if (trialDays !== null) {
+                  return (
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      trialDays <= 3
+                        ? 'bg-red-500/20 border border-red-500/30 text-red-300'
+                        : 'bg-cyan-500/20 border border-cyan-500/30 text-cyan-300'
+                    }`}>
+                      {trialDays} day{trialDays !== 1 ? 's' : ''} left
+                    </span>
+                  );
+                }
+                return null;
+              })()}
             </div>
           </div>
         </header>
@@ -501,7 +655,7 @@ function DashboardContent() {
         <div className="p-6">
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
+            <div className="bg-zinc-900/50 backdrop-blur border border-zinc-800 rounded-xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-white/60 text-sm font-medium">Total Orders</h3>
                 <span className="text-2xl">📦</span>
@@ -510,7 +664,7 @@ function DashboardContent() {
               <div className="text-white/40 text-sm">{dateRange.label}</div>
             </div>
 
-            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
+            <div className="bg-zinc-900/50 backdrop-blur border border-zinc-800 rounded-xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-white/60 text-sm font-medium">Gross Revenue</h3>
                 <span className="text-2xl">💰</span>
@@ -519,7 +673,7 @@ function DashboardContent() {
               <div className="text-white/40 text-sm">Before fees</div>
             </div>
 
-            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
+            <div className="bg-zinc-900/50 backdrop-blur border border-zinc-800 rounded-xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-white/60 text-sm font-medium">Total Fees</h3>
                 <span className="text-2xl">📉</span>
@@ -528,7 +682,7 @@ function DashboardContent() {
               <div className="text-white/40 text-sm">Platform + shipping</div>
             </div>
 
-            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
+            <div className="bg-zinc-900/50 backdrop-blur border border-zinc-800 rounded-xl p-6">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-white/60 text-sm font-medium">Net Revenue</h3>
                 <span className="text-2xl">📈</span>
@@ -539,7 +693,7 @@ function DashboardContent() {
           </div>
 
           {/* Channel Connections */}
-          <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6 mb-8">
+          <div className="bg-zinc-900/50 backdrop-blur border border-zinc-800 rounded-xl p-6 mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-white">Connected Channels</h2>
               <button
@@ -576,10 +730,10 @@ function DashboardContent() {
                   return (
                     <div
                       key={platform}
-                      className={`p-4 rounded-lg border ${connection ? getPlatformColor(platform) : 'bg-white/5 border-white/10'}`}
+                      className={`p-4 rounded-lg border ${connection ? getPlatformColor(platform) : 'bg-zinc-900/50 border-zinc-800'}`}
                     >
                       <div className="flex items-center gap-3 mb-3">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${connection ? '' : 'bg-white/10'}`}>
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${connection ? '' : 'bg-zinc-800'}`}>
                           {getPlatformIcon(platform)}
                         </div>
                         <div>
@@ -591,7 +745,7 @@ function DashboardContent() {
                       </div>
 
                       {connection && metrics && (
-                        <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10">
+                        <div className="grid grid-cols-2 gap-2 pt-3 border-t border-zinc-800">
                           <div>
                             <div className="text-white/40 text-xs">Orders</div>
                             <div className="text-white font-medium">{metrics.orders_count}</div>
@@ -606,7 +760,7 @@ function DashboardContent() {
                       {!connection && (
                         <button
                           onClick={() => navigateInApp('/dashboard/channels')}
-                          className="block w-full mt-3 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-center rounded-lg text-sm font-medium transition"
+                          className="block w-full mt-3 px-4 py-2 bg-zinc-800 hover:bg-white/20 text-white text-center rounded-lg text-sm font-medium transition"
                         >
                           Connect {platform.charAt(0).toUpperCase() + platform.slice(1)}
                         </button>
@@ -620,7 +774,7 @@ function DashboardContent() {
 
           {/* Revenue by Channel */}
           {channelMetrics.length > 0 && (
-            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6 mb-8">
+            <div className="bg-zinc-900/50 backdrop-blur border border-zinc-800 rounded-xl p-6 mb-8">
               <h2 className="text-xl font-bold text-white mb-6">Revenue by Channel</h2>
               <div className="space-y-4">
                 {channelMetrics.map((metric) => {
@@ -636,7 +790,7 @@ function DashboardContent() {
                         </div>
                         <span className="text-white font-bold">${metric.gross_revenue.toFixed(2)}</span>
                       </div>
-                      <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all ${
                             metric.platform === 'shopify' ? 'bg-green-500' :
@@ -654,7 +808,7 @@ function DashboardContent() {
           )}
 
           {/* Recent Orders */}
-          <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
+          <div className="bg-zinc-900/50 backdrop-blur border border-zinc-800 rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-white">Recent Orders</h2>
               <button
@@ -672,7 +826,7 @@ function DashboardContent() {
             ) : (
               <div className="space-y-3">
                 {filteredOrders.slice(0, 10).map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+                  <div key={order.id} className="flex items-center justify-between p-4 bg-zinc-900/50 rounded-lg">
                     <div className="flex items-center gap-4">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getPlatformColor(order.platform)}`}>
                         {getPlatformIcon(order.platform)}
@@ -704,7 +858,7 @@ function DashboardContent() {
 export default function DashboardPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-cyan-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-solid border-cyan-500 border-r-transparent mb-4"></div>
           <div className="text-white text-xl">Loading dashboard...</div>
