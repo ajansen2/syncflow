@@ -4,12 +4,11 @@ import { createClient } from '@supabase/supabase-js';
 // Helper to build Shopify admin URL for embedded app redirect
 function buildShopifyAdminUrl(shop: string, params?: Record<string, string>): string {
   const shopName = shop.replace('.myshopify.com', '');
-  const apiKey = process.env.SHOPIFY_API_KEY;
+  // Use SHOPIFY_API_KEY with fallback to hardcoded key for SyncFlow
+  const apiKey = process.env.SHOPIFY_API_KEY || 'ebcd49739472f025754a6afcc20bf66d';
 
-  if (!apiKey) {
-    console.error('❌ SHOPIFY_API_KEY is not set!');
-    // Fallback - this shouldn't happen in production
-    throw new Error('SHOPIFY_API_KEY environment variable is not set');
+  if (!process.env.SHOPIFY_API_KEY) {
+    console.warn('⚠️ SHOPIFY_API_KEY not set, using fallback');
   }
 
   const baseUrl = `https://admin.shopify.com/store/${shopName}/apps/${apiKey}`;
@@ -152,7 +151,8 @@ export async function GET(request: NextRequest) {
       if (merchant) {
         // For embedded apps, construct the proper Shopify admin URL
         const shopName = shop!.replace('.myshopify.com', '');
-        const shopifyAdminUrl = `https://admin.shopify.com/store/${shopName}/apps/${process.env.SHOPIFY_API_KEY}`;
+        const apiKey = process.env.SHOPIFY_API_KEY || 'ebcd49739472f025754a6afcc20bf66d';
+        const shopifyAdminUrl = `https://admin.shopify.com/store/${shopName}/apps/${apiKey}`;
 
         console.log('🔄 Redirecting to:', shopifyAdminUrl);
         console.log('📍 Shop:', shop);
