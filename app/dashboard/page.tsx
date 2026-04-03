@@ -65,6 +65,9 @@ function DashboardContent() {
   const [syncing, setSyncing] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(1);
+  const [showBillingRequired, setShowBillingRequired] = useState(false);
+  const [billingUrl, setBillingUrl] = useState<string | null>(null);
+  const [subscribing, setSubscribing] = useState(false);
 
   const router = useRouter();
 
@@ -76,6 +79,48 @@ function DashboardContent() {
     const daysLeft = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     return Math.max(0, daysLeft);
   };
+
+  // Check if subscription is required (trial expired and not active)
+  const isSubscriptionRequired = () => {
+    if (!store) return false;
+    if (store.subscription_status === 'active') return false;
+    const trialDays = getTrialDaysLeft();
+    if (trialDays === null) return true; // No trial info, require subscription
+    return trialDays <= 0;
+  };
+
+  // Handle subscribe button click
+  const handleSubscribe = async () => {
+    if (!store) return;
+    setSubscribing(true);
+    try {
+      const shop = searchParams.get('shop');
+      const response = await fetch('/api/billing/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shop })
+      });
+      const data = await response.json();
+      if (data.confirmationUrl) {
+        redirectToOAuth(data.confirmationUrl);
+      } else if (data.oauthUrl) {
+        redirectToOAuth(data.oauthUrl);
+      }
+    } catch (error) {
+      console.error('Error creating billing charge:', error);
+    } finally {
+      setSubscribing(false);
+    }
+  };
+
+  // Check subscription status after store loads
+  useEffect(() => {
+    if (store && !loading) {
+      if (isSubscriptionRequired()) {
+        setShowBillingRequired(true);
+      }
+    }
+  }, [store, loading]);
 
   // Show onboarding only ONCE for new users
   useEffect(() => {
@@ -365,6 +410,49 @@ function DashboardContent() {
           <h2 className="text-2xl font-bold text-white mb-3">Unable to Load Dashboard</h2>
           <p className="text-white/80 mb-6">{loadError}</p>
           <p className="text-white/60 text-sm">Contact support at adam@argora.ai</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Billing Required Paywall - blocks entire UI
+  if (showBillingRequired) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6">
+        <div className="max-w-lg w-full">
+          <div className="bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border-2 border-cyan-500/50 rounded-2xl p-8 text-center">
+            <div className="w-20 h-20 bg-cyan-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-3">Trial Ended</h2>
+            <p className="text-white/70 mb-6 text-lg">
+              Your 14-day free trial has expired. Subscribe to SyncFlow to continue syncing your sales channels.
+            </p>
+            <div className="bg-zinc-900/50 rounded-xl p-4 mb-6">
+              <div className="text-white/60 text-sm mb-1">SyncFlow Pro</div>
+              <div className="text-3xl font-bold text-white">$29.99<span className="text-lg font-normal text-white/60">/month</span></div>
+              <div className="text-cyan-400 text-sm mt-1">Unlimited channels, orders & analytics</div>
+            </div>
+            <button
+              onClick={handleSubscribe}
+              disabled={subscribing}
+              className="w-full py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 disabled:opacity-50 text-white rounded-xl font-bold text-lg transition"
+            >
+              {subscribing ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Processing...
+                </span>
+              ) : (
+                'Subscribe Now'
+              )}
+            </button>
+            <p className="text-white/40 text-sm mt-4">
+              Secure payment through Shopify. Cancel anytime.
+            </p>
+          </div>
         </div>
       </div>
     );
