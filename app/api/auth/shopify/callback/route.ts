@@ -6,6 +6,17 @@ import crypto from 'crypto';
  * ChannelSync - Shopify OAuth Callback
  * Handles token exchange, store creation, and billing
  */
+
+function topLevelRedirectHTML(url: string, message: string = 'Redirecting...'): string {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><title>${message}</title>
+<style>body{background:#0a0a0a;color:white;font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}.loader{text-align:center}.spinner{width:40px;height:40px;border:3px solid #333;border-top:3px solid #8b5cf6;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}@keyframes spin{to{transform:rotate(360deg)}}</style>
+</head>
+<body><div class="loader"><div class="spinner"></div><p>${message}</p></div>
+<script>if(window.top&&window.top!==window.self){window.top.location.href=${JSON.stringify(url)}}else{window.location.href=${JSON.stringify(url)}}</script>
+</body></html>`;
+}
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -290,7 +301,10 @@ export async function GET(request: NextRequest) {
 
         console.log('✅ Billing charge created, redirecting to:', confirmationUrl);
 
-        const response = NextResponse.redirect(confirmationUrl);
+        const response = new NextResponse(
+          topLevelRedirectHTML(confirmationUrl, 'Redirecting to billing approval...'),
+          { status: 200, headers: { 'Content-Type': 'text/html' } }
+        );
         response.cookies.delete('shopify_oauth_state');
         return response;
       } else {
@@ -300,8 +314,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Go to dashboard if already has active charge or billing creation fails
-    console.log('📍 Redirecting to dashboard');
-    const response = NextResponse.redirect(`https://admin.shopify.com/store/${shopName}/apps/${apiKey}?shop=${shop}`);
+    const dashboardUrl = hasActiveCharge
+      ? `https://admin.shopify.com/store/${shopName}/apps/${apiKey}?shop=${shop}`
+      : `https://admin.shopify.com/store/${shopName}/apps/${apiKey}?shop=${shop}&billing_required=true`;
+    console.log('📍 Redirecting to dashboard:', dashboardUrl);
+    const response = new NextResponse(
+      topLevelRedirectHTML(dashboardUrl, hasActiveCharge ? 'Loading dashboard...' : 'Redirecting to dashboard...'),
+      { status: 200, headers: { 'Content-Type': 'text/html' } }
+    );
     response.cookies.delete('shopify_oauth_state');
     return response;
 
