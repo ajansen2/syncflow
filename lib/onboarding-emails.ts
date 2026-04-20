@@ -12,7 +12,11 @@
 
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
 const FROM = 'SyncFlow <hello@send.argora.ai>';
 
 function dashboardUrl(shopDomain: string): string {
@@ -203,7 +207,7 @@ export async function sendOnboardingEmail(
   email: { subject: string; html: string }
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: FROM,
       to,
       subject: email.subject,
