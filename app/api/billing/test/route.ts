@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
       body: JSON.stringify({
         recurring_application_charge: {
           name: 'SyncFlow - Pro Plan',
-          price: 99.99,
+          price: 29.99,
           trial_days: 7,
           return_url: returnUrl,
           test: isTestCharge,

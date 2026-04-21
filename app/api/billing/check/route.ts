@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
           recurring_application_charge: {
             name: 'SyncFlow - All Channels',
             price: 29.99,
-            trial_days: 14,
+            trial_days: 7,
             return_url: returnUrl,
             ...(isTestCharge && { test: true }),
           }

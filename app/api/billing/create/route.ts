@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
               {
                 plan: {
                   appRecurringPricingDetails: {
-                    price: { amount: 99.99, currencyCode: 'USD' },
+                    price: { amount: 29.99, currencyCode: 'USD' },
                     interval: 'EVERY_30_DAYS',
                   },
                 },
