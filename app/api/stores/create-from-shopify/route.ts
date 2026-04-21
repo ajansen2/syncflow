@@ -6,8 +6,7 @@ import { getAuthenticatedShop } from '@/lib/verify-session';
 // This is called when a Shopify app is installed but records don't exist yet
 export async function POST(request: NextRequest) {
   try {
-    // Allow unsigned during install flow
-    const authenticatedShop = getAuthenticatedShop(request, true);
+    const authenticatedShop = getAuthenticatedShop(request);
     const { shop } = await request.json();
     const resolvedShop = authenticatedShop || shop;
 

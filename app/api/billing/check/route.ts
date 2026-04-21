@@ -8,8 +8,7 @@ import { getAuthenticatedShop } from '@/lib/verify-session';
  */
 export async function POST(request: NextRequest) {
   try {
-    // Allow unsigned during billing flow
-    const authenticatedShop = getAuthenticatedShop(request, true);
+    const authenticatedShop = getAuthenticatedShop(request);
     const body = await request.json();
     const shop = authenticatedShop || body.shop;
 

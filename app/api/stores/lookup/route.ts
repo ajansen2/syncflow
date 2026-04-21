@@ -5,8 +5,7 @@ import { getAuthenticatedShop } from '@/lib/verify-session';
 // API endpoint to look up merchant by shop URL (bypasses RLS)
 export async function GET(request: NextRequest) {
   try {
-    // Allow unsigned requests for initial store lookup during install flow
-    const authenticatedShop = getAuthenticatedShop(request, true);
+    const authenticatedShop = getAuthenticatedShop(request);
     const shop = authenticatedShop || request.nextUrl.searchParams.get('shop');
 
     if (!shop) {
