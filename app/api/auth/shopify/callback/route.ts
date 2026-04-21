@@ -251,62 +251,81 @@ export async function GET(request: NextRequest) {
     const shopName = shop.replace('.myshopify.com', '');
     const returnUrl = `${appUrl}/api/billing/callback?shop=${shop}&store_id=${store.id}`;
 
-    // First check for existing active charges
-    console.log('💰 Checking for existing charges...');
-    const existingChargesResponse = await fetch(`https://${shop}/admin/api/2024-10/recurring_application_charges.json`, {
-      headers: { 'X-Shopify-Access-Token': accessToken },
+    // Check for existing active subscriptions via GraphQL
+    console.log('💰 Checking for existing subscriptions via GraphQL...');
+    let hasActiveCharge = false;
+
+    const existingSubsResponse = await fetch(`https://${shop}/admin/api/2024-10/graphql.json`, {
+      method: 'POST',
+      headers: {
+        'X-Shopify-Access-Token': accessToken,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `query { currentAppInstallation { activeSubscriptions { id name status } } }`,
+      }),
     });
 
-    let hasActiveCharge = false;
-    if (existingChargesResponse.ok) {
-      const existingCharges = await existingChargesResponse.json();
-      console.log('💰 Existing charges:', JSON.stringify(existingCharges.recurring_application_charges?.map((c: any) => ({ id: c.id, status: c.status, name: c.name }))));
-
-      const activeCharge = existingCharges.recurring_application_charges?.find(
-        (c: any) => c.status === 'active'
-      );
-      if (activeCharge) {
-        console.log('✅ Already has active billing charge:', activeCharge.id, activeCharge.status);
-        hasActiveCharge = true;
-      }
-    } else {
-      console.log('💰 Failed to fetch existing charges:', existingChargesResponse.status);
+    if (existingSubsResponse.ok) {
+      const subsData = await existingSubsResponse.json();
+      const subs = subsData.data?.currentAppInstallation?.activeSubscriptions || [];
+      hasActiveCharge = subs.some((s: any) => s.status === 'ACTIVE');
+      console.log('💰 Active subscriptions:', subs.length, 'hasActive:', hasActiveCharge);
     }
 
-    // Only create new charge if no active one exists
+    // Only create new subscription if no active one exists
     if (!hasActiveCharge) {
-      console.log('💰 Creating new billing charge...');
-      const chargeResponse = await fetch(`https://${shop}/admin/api/2024-10/recurring_application_charges.json`, {
+      console.log('💰 Creating new subscription via GraphQL...');
+      const chargeResponse = await fetch(`https://${shop}/admin/api/2024-10/graphql.json`, {
         method: 'POST',
         headers: {
           'X-Shopify-Access-Token': accessToken,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          recurring_application_charge: {
-            name: 'SyncFlow - All Channels',
-            price: 29.99,
-            trial_days: 7,
-            return_url: returnUrl,
-            ...(isTestCharge && { test: true }),
-          }
-        })
+          query: `
+            mutation AppSubscriptionCreate($name: String!, $returnUrl: URL!, $trialDays: Int, $test: Boolean, $lineItems: [AppSubscriptionLineItemInput!]!) {
+              appSubscriptionCreate(name: $name, returnUrl: $returnUrl, trialDays: $trialDays, test: $test, lineItems: $lineItems) {
+                appSubscription { id status }
+                confirmationUrl
+                userErrors { field message }
+              }
+            }
+          `,
+          variables: {
+            name: 'SyncFlow Pro',
+            returnUrl,
+            trialDays: 7,
+            test: isTestCharge,
+            lineItems: [{
+              plan: {
+                appRecurringPricingDetails: {
+                  price: { amount: 29.99, currencyCode: 'USD' },
+                  interval: 'EVERY_30_DAYS',
+                },
+              },
+            }],
+          },
+        }),
       });
-
-      console.log('💰 Billing response status:', chargeResponse.status);
 
       if (chargeResponse.ok) {
         const chargeData = await chargeResponse.json();
-        const confirmationUrl = chargeData.recurring_application_charge.confirmation_url;
+        const userErrors = chargeData.data?.appSubscriptionCreate?.userErrors;
+        const confirmationUrl = chargeData.data?.appSubscriptionCreate?.confirmationUrl;
 
-        console.log('✅ Billing charge created, redirecting to:', confirmationUrl);
+        if (userErrors?.length > 0) {
+          console.error('❌ Subscription user errors:', userErrors);
+        } else if (confirmationUrl) {
+          console.log('✅ Subscription created, redirecting to:', confirmationUrl);
 
-        const response = new NextResponse(
-          topLevelRedirectHTML(confirmationUrl, 'Redirecting to billing approval...'),
-          { status: 200, headers: { 'Content-Type': 'text/html' } }
-        );
-        response.cookies.delete('shopify_oauth_state');
-        return response;
+          const response = new NextResponse(
+            topLevelRedirectHTML(confirmationUrl, 'Redirecting to billing approval...'),
+            { status: 200, headers: { 'Content-Type': 'text/html' } }
+          );
+          response.cookies.delete('shopify_oauth_state');
+          return response;
+        }
       } else {
         const errorText = await chargeResponse.text();
         console.error('❌ Billing charge failed:', chargeResponse.status, errorText);

@@ -21,7 +21,7 @@ export default function ConnectStorePage() {
         </div>
         <h2 className="text-2xl font-bold text-white mb-3">Install from Shopify App Store</h2>
         <p className="text-white/80 mb-6">
-          To use Argora Cart Recovery, please install the app from the Shopify App Store.
+          To use SyncFlow, please install the app from the Shopify App Store.
         </p>
         <a
           href="https://apps.shopify.com"
@@ -32,7 +32,7 @@ export default function ConnectStorePage() {
           Go to Shopify App Store
         </a>
         <p className="text-white/60 text-sm mt-6">
-          Search for "Argora Cart Recovery" or contact support at support@argora.ai
+          Search for "SyncFlow" or contact support at adam@argora.ai
         </p>
       </div>
     </div>

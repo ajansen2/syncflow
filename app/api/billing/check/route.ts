@@ -47,38 +47,36 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Check existing charges with Shopify
-    const chargesResponse = await fetch(
-      `https://${shop}/admin/api/2024-10/recurring_application_charges.json`,
-      { headers: { 'X-Shopify-Access-Token': store.access_token } }
-    );
+    // Check existing subscriptions via GraphQL
+    const subsResponse = await fetch(`https://${shop}/admin/api/2024-10/graphql.json`, {
+      method: 'POST',
+      headers: {
+        'X-Shopify-Access-Token': store.access_token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `query { currentAppInstallation { activeSubscriptions { id name status } } }`,
+      }),
+    });
 
-    if (!chargesResponse.ok) {
-      console.error('Failed to fetch charges:', chargesResponse.status);
-      // Token might be invalid - need to re-authorize
-      if (chargesResponse.status === 401) {
-        const apiKey = process.env.SHOPIFY_API_KEY;
+    if (!subsResponse.ok) {
+      console.error('Failed to fetch subscriptions:', subsResponse.status);
+      if (subsResponse.status === 401) {
         const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://syncflow-blush.vercel.app';
         const oauthUrl = `${appUrl}/api/auth/shopify/install?shop=${shop}`;
-        return NextResponse.json({
-          needsOAuth: true,
-          oauthUrl
-        });
+        return NextResponse.json({ needsOAuth: true, oauthUrl });
       }
       return NextResponse.json({ needsBilling: false });
     }
 
-    const chargesData = await chargesResponse.json();
-    const charges = chargesData.recurring_application_charges || [];
+    const subsData = await subsResponse.json();
+    const subs = subsData.data?.currentAppInstallation?.activeSubscriptions || [];
+    console.log('💰 Active subscriptions:', subs.length);
 
-    console.log('💰 Existing charges:', charges.map((c: any) => ({ id: c.id, status: c.status })));
+    const activeSub = subs.find((s: any) => s.status === 'ACTIVE');
+    if (activeSub) {
+      console.log('✅ Active subscription found:', activeSub.id);
 
-    // Check for active charge
-    const activeCharge = charges.find((c: any) => c.status === 'active');
-    if (activeCharge) {
-      console.log('✅ Active billing found:', activeCharge.id);
-
-      // Update store subscription status if needed
       if (store.subscription_status !== 'active') {
         await supabase
           .from('stores')
@@ -89,54 +87,60 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ needsBilling: false, status: 'active' });
     }
 
-    // Check for pending charge that needs approval
-    const pendingCharge = charges.find((c: any) => c.status === 'pending');
-    if (pendingCharge) {
-      console.log('⏳ Pending charge found, redirecting to approval:', pendingCharge.id);
-      return NextResponse.json({
-        needsBilling: true,
-        confirmationUrl: pendingCharge.confirmation_url
-      });
-    }
-
-    // No active or pending charge - create new one
-    console.log('💰 Creating new billing charge...');
+    // No active subscription - create new one via GraphQL
+    console.log('💰 Creating new subscription via GraphQL...');
 
     const isTestCharge = shop.includes('-test') || shop.includes('development') || shop.includes('dev-');
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://syncflow-blush.vercel.app';
     const returnUrl = `${appUrl}/api/billing/callback?shop=${shop}&store_id=${store.id}`;
 
-    const createResponse = await fetch(
-      `https://${shop}/admin/api/2024-10/recurring_application_charges.json`,
-      {
-        method: 'POST',
-        headers: {
-          'X-Shopify-Access-Token': store.access_token,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          recurring_application_charge: {
-            name: 'SyncFlow - All Channels',
-            price: 29.99,
-            trial_days: 7,
-            return_url: returnUrl,
-            ...(isTestCharge && { test: true }),
+    const createResponse = await fetch(`https://${shop}/admin/api/2024-10/graphql.json`, {
+      method: 'POST',
+      headers: {
+        'X-Shopify-Access-Token': store.access_token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `
+          mutation AppSubscriptionCreate($name: String!, $returnUrl: URL!, $trialDays: Int, $test: Boolean, $lineItems: [AppSubscriptionLineItemInput!]!) {
+            appSubscriptionCreate(name: $name, returnUrl: $returnUrl, trialDays: $trialDays, test: $test, lineItems: $lineItems) {
+              appSubscription { id status }
+              confirmationUrl
+              userErrors { field message }
+            }
           }
-        })
-      }
-    );
+        `,
+        variables: {
+          name: 'SyncFlow Pro',
+          returnUrl,
+          trialDays: 7,
+          test: isTestCharge,
+          lineItems: [{
+            plan: {
+              appRecurringPricingDetails: {
+                price: { amount: 29.99, currencyCode: 'USD' },
+                interval: 'EVERY_30_DAYS',
+              },
+            },
+          }],
+        },
+      }),
+    });
 
     if (!createResponse.ok) {
       const errorText = await createResponse.text();
-      console.error('❌ Failed to create charge:', createResponse.status, errorText);
-      return NextResponse.json({
-        needsBilling: false,
-        error: 'Failed to create billing charge'
-      });
+      console.error('❌ Failed to create subscription:', createResponse.status, errorText);
+      return NextResponse.json({ needsBilling: false, error: 'Failed to create billing' });
     }
 
     const createData = await createResponse.json();
-    const confirmationUrl = createData.recurring_application_charge?.confirmation_url;
+    const userErrors = createData.data?.appSubscriptionCreate?.userErrors;
+    if (userErrors?.length > 0) {
+      console.error('❌ Subscription user errors:', userErrors);
+      return NextResponse.json({ needsBilling: false, error: userErrors[0].message });
+    }
+
+    const confirmationUrl = createData.data?.appSubscriptionCreate?.confirmationUrl;
 
     console.log('✅ Charge created, confirmation URL:', confirmationUrl);
 
