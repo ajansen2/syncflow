@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase-client';
-import { navigateInApp } from '@/lib/shopify-app-bridge';
+import { navigateInApp, authenticatedFetch } from '@/lib/shopify-app-bridge';
 import Link from 'next/link';
 
 interface Store {
@@ -42,12 +42,10 @@ function ChannelsContent() {
       }
 
       try {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', `/api/stores/lookup?shop=${encodeURIComponent(shop)}`, false);
-        xhr.send();
+        const lookupResponse = await authenticatedFetch(`/api/stores/lookup?shop=${encodeURIComponent(shop)}`);
 
-        if (xhr.status === 200) {
-          const data = JSON.parse(xhr.responseText);
+        if (lookupResponse.ok) {
+          const data = await lookupResponse.json();
           if (data.store) {
             setStore(data.store);
 

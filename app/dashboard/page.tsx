@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase-client';
-import { initializeAppBridge, isEmbeddedInShopify, navigateInApp, getShopifySessionToken, redirectToOAuth, redirectToShopifyAdmin } from '@/lib/shopify-app-bridge';
+import { initializeAppBridge, isEmbeddedInShopify, navigateInApp, getShopifySessionToken, redirectToOAuth, redirectToShopifyAdmin, authenticatedFetch } from '@/lib/shopify-app-bridge';
 import Link from 'next/link';
 
 type DateRangeOption = '7d' | '14d' | '30d' | '90d' | 'all';
@@ -95,7 +95,7 @@ function DashboardContent() {
     setSubscribing(true);
     try {
       const shop = searchParams.get('shop');
-      const response = await fetch('/api/billing/check', {
+      const response = await authenticatedFetch('/api/billing/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ shop })
@@ -125,19 +125,28 @@ function DashboardContent() {
   // Show onboarding only ONCE for new users
   useEffect(() => {
     if (store && !loading) {
-      const storageKey = `channelsync_onboarding_${store.id}`;
-      const hasSeenOnboarding = localStorage.getItem(storageKey);
-      if (hasSeenOnboarding !== 'true') {
-        setShowOnboarding(true);
-        // Immediately mark as seen to prevent re-showing on refresh
-        localStorage.setItem(storageKey, 'true');
+      try {
+        const storageKey = `channelsync_onboarding_${store.id}`;
+        const hasSeenOnboarding = localStorage.getItem(storageKey);
+        if (hasSeenOnboarding !== 'true') {
+          setShowOnboarding(true);
+          // Immediately mark as seen to prevent re-showing on refresh
+          localStorage.setItem(storageKey, 'true');
+        }
+      } catch (e) {
+        // localStorage may be unavailable in embedded iframes
+        console.warn('localStorage unavailable:', e);
       }
     }
   }, [store, loading]);
 
   const completeOnboarding = () => {
     if (store) {
-      localStorage.setItem(`channelsync_onboarding_${store.id}`, 'true');
+      try {
+        localStorage.setItem(`channelsync_onboarding_${store.id}`, 'true');
+      } catch (e) {
+        console.warn('localStorage unavailable:', e);
+      }
     }
     setShowOnboarding(false);
     setOnboardingStep(1);
@@ -233,12 +242,10 @@ function DashboardContent() {
         }
 
         try {
-          const xhr = new XMLHttpRequest();
-          xhr.open('GET', `/api/stores/lookup?shop=${encodeURIComponent(shop)}`, false);
-          xhr.send();
+          const lookupResponse = await authenticatedFetch(`/api/stores/lookup?shop=${encodeURIComponent(shop)}`);
 
-          if (xhr.status === 200) {
-            const data = JSON.parse(xhr.responseText);
+          if (lookupResponse.ok) {
+            const data = await lookupResponse.json();
             if (data.store) {
               setStore(data.store);
 
@@ -246,7 +253,7 @@ function DashboardContent() {
               const billingParam = searchParams.get('billing');
               if (billingParam !== 'success') {
                 setLoadingMessage('Checking subscription...');
-                const billingResponse = await fetch('/api/billing/check', {
+                const billingResponse = await authenticatedFetch('/api/billing/check', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ shop })
@@ -274,8 +281,8 @@ function DashboardContent() {
 
               await loadChannelsAndOrders(data.store.id);
             }
-          } else if (xhr.status === 404) {
-            const installResponse = await fetch('/api/shopify/install-embedded', {
+          } else if (lookupResponse.status === 404) {
+            const installResponse = await authenticatedFetch('/api/shopify/install-embedded', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ shop })
@@ -287,7 +294,7 @@ function DashboardContent() {
 
               // Check billing for new installs too
               setLoadingMessage('Setting up subscription...');
-              const billingResponse = await fetch('/api/billing/check', {
+              const billingResponse = await authenticatedFetch('/api/billing/check', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ shop })
@@ -348,7 +355,7 @@ function DashboardContent() {
     setSyncing(true);
 
     try {
-      const response = await fetch('/api/sync/orders', {
+      const response = await authenticatedFetch('/api/sync/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ storeId: store.id })

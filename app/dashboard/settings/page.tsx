@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { getSupabaseClient } from '@/lib/supabase-client';
-import { navigateInApp } from '@/lib/shopify-app-bridge';
+import { navigateInApp, authenticatedFetch } from '@/lib/shopify-app-bridge';
 
 interface Store {
   id: string;
@@ -47,12 +47,10 @@ function SettingsContent() {
       }
 
       try {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', `/api/stores/lookup?shop=${encodeURIComponent(shop)}`, false);
-        xhr.send();
+        const lookupResponse = await authenticatedFetch(`/api/stores/lookup?shop=${encodeURIComponent(shop)}`);
 
-        if (xhr.status === 200) {
-          const data = JSON.parse(xhr.responseText);
+        if (lookupResponse.ok) {
+          const data = await lookupResponse.json();
           if (data.store) {
             setStore(data.store);
             // Load saved settings
@@ -88,7 +86,7 @@ function SettingsContent() {
 
     setSavingSyncSettings(true);
     try {
-      const response = await fetch('/api/stores/settings', {
+      const response = await authenticatedFetch('/api/stores/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -116,7 +114,7 @@ function SettingsContent() {
 
     setSavingEmailSettings(true);
     try {
-      const response = await fetch('/api/stores/settings', {
+      const response = await authenticatedFetch('/api/stores/settings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
