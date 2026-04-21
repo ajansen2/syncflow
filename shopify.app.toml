@@ -27,7 +27,7 @@ shop_deletion_url = "https://syncflow-blush.vercel.app/api/webhooks/shop/redact"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_analytics,read_customers,read_inventory,read_orders,read_products,read_reports"
+scopes = "read_orders,read_customers,read_products"
 optional_scopes = [ ]
 use_legacy_install_flow = false
 
