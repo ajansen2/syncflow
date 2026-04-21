@@ -107,8 +107,10 @@ export async function GET(request: NextRequest) {
           email: shopInfo.email,
           currency: shopInfo.currency,
           timezone: shopInfo.iana_timezone,
-          subscription_status: 'trial',
-          trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+          // Only reset to trial if previously cancelled — preserve active subscriptions on reinstall
+          ...(existingStore.subscription_status === 'cancelled' || existingStore.subscription_status === 'expired'
+            ? { subscription_status: 'trial', trial_ends_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() }
+            : {}),
           updated_at: new Date().toISOString(),
         })
         .eq('id', existingStore.id)
