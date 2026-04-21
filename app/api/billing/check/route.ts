@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthenticatedShop } from '@/lib/verify-session';
 
 /**
  * Check billing status and create charge if needed
@@ -7,7 +8,10 @@ import { createClient } from '@supabase/supabase-js';
  */
 export async function POST(request: NextRequest) {
   try {
-    const { shop } = await request.json();
+    // Allow unsigned during billing flow
+    const authenticatedShop = getAuthenticatedShop(request, true);
+    const body = await request.json();
+    const shop = authenticatedShop || body.shop;
 
     if (!shop) {
       return NextResponse.json({ error: 'Missing shop parameter' }, { status: 400 });

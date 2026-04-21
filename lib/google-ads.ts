@@ -123,7 +123,10 @@ export async function getGoogleAdsCustomers(accessToken: string): Promise<Google
   console.log('🔵 [Google Ads] Access token (first 20 chars):', accessToken?.substring(0, 20) + '...');
 
   // Manager Account ID (MCC) - required for API calls
-  const loginCustomerId = process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || '7167233993';
+  const loginCustomerId = process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID;
+  if (!loginCustomerId) {
+    throw new Error('GOOGLE_ADS_LOGIN_CUSTOMER_ID environment variable is required');
+  }
 
   console.log('🔵 [Google Ads] Using login-customer-id:', loginCustomerId);
 

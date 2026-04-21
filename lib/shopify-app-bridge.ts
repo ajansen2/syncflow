@@ -62,8 +62,14 @@ export function initializeAppBridge() {
         return null;
       }
 
+      const apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY;
+      if (!apiKey) {
+        console.warn('NEXT_PUBLIC_SHOPIFY_API_KEY not set - cannot initialize App Bridge');
+        return null;
+      }
+
       appBridge = window.shopify.createApp({
-        apiKey: process.env.NEXT_PUBLIC_SHOPIFY_API_KEY || 'e84f4a7fecd1e8c9c05791a35c0336d4',
+        apiKey,
         host: host,
         forceRedirect: false,
       });
@@ -181,7 +187,11 @@ export function redirectToShopifyAdmin(shop: string): boolean {
   }
 
   // Get the Shopify API key (client ID)
-  const apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY || 'ebcd49739472f025754a6afcc20bf66d';
+  const apiKey = process.env.NEXT_PUBLIC_SHOPIFY_API_KEY;
+  if (!apiKey) {
+    console.warn('NEXT_PUBLIC_SHOPIFY_API_KEY not set - cannot redirect to Shopify admin');
+    return false;
+  }
 
   // Extract store name from shop domain (e.g., "argora-test" from "argora-test.myshopify.com")
   const storeName = shop.replace('.myshopify.com', '');

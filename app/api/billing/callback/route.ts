@@ -4,21 +4,71 @@ import { createClient } from '@supabase/supabase-js';
 // Helper to build Shopify admin URL for embedded app redirect
 function buildShopifyAdminUrl(shop: string, params?: Record<string, string>): string {
   const shopName = shop.replace('.myshopify.com', '');
-  // Use SHOPIFY_API_KEY with fallback to hardcoded key for SyncFlow
-  const apiKey = process.env.SHOPIFY_API_KEY || 'ebcd49739472f025754a6afcc20bf66d';
+  const apiKey = process.env.SHOPIFY_API_KEY;
 
-  if (!process.env.SHOPIFY_API_KEY) {
-    console.warn('⚠️ SHOPIFY_API_KEY not set, using fallback');
+  if (!apiKey) {
+    console.error('SHOPIFY_API_KEY is not set');
+    throw new Error('SHOPIFY_API_KEY environment variable is required');
   }
 
   const baseUrl = `https://admin.shopify.com/store/${shopName}/apps/${apiKey}`;
-  console.log('🔗 Building Shopify admin URL:', baseUrl);
+  console.log('Building Shopify admin URL:', baseUrl);
 
   if (params && Object.keys(params).length > 0) {
     const searchParams = new URLSearchParams(params);
     return `${baseUrl}?${searchParams.toString()}`;
   }
   return baseUrl;
+}
+
+/**
+ * Query active subscriptions via Shopify GraphQL Admin API
+ */
+async function getActiveSubscription(shop: string, accessToken: string): Promise<{ id: string; status: string; name: string } | null> {
+  const response = await fetch(
+    `https://${shop}/admin/api/2024-10/graphql.json`,
+    {
+      method: 'POST',
+      headers: {
+        'X-Shopify-Access-Token': accessToken,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: `{
+          currentAppInstallation {
+            activeSubscriptions {
+              id
+              name
+              status
+              test
+              currentPeriodEnd
+              trialDays
+            }
+          }
+        }`,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    console.error('GraphQL request failed:', response.status);
+    return null;
+  }
+
+  const data = await response.json();
+  const subscriptions = data?.data?.currentAppInstallation?.activeSubscriptions;
+
+  if (!subscriptions || subscriptions.length === 0) {
+    return null;
+  }
+
+  // Return the first active subscription
+  const sub = subscriptions[0];
+  return {
+    id: sub.id,
+    status: sub.status,
+    name: sub.name,
+  };
 }
 
 export async function GET(request: NextRequest) {
@@ -53,57 +103,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(buildShopifyAdminUrl(shop, { error: 'store_not_found' }));
     }
 
-    // Verify and activate the charge
-    const chargeResponse = await fetch(
-      `https://${shop}/admin/api/2024-01/recurring_application_charges/${chargeId}.json`,
-      {
-        headers: {
-          'X-Shopify-Access-Token': store.access_token,
-        },
-      }
-    );
+    // Use GraphQL to check active subscriptions instead of REST
+    const activeSubscription = await getActiveSubscription(shop, store.access_token);
 
-    if (!chargeResponse.ok) {
-      console.error('Failed to fetch charge details');
-      return NextResponse.redirect(buildShopifyAdminUrl(shop, { error: 'billing_fetch_failed' }));
-    }
+    if (!activeSubscription) {
+      console.log('No active subscription found - merchant may have declined');
 
-    const chargeData = await chargeResponse.json();
-    const charge = chargeData.recurring_application_charge;
-
-    console.log('📋 Charge status:', charge.status);
-
-    // Handle accepted status - needs activation
-    if (charge.status === 'accepted') {
-      const activateResponse = await fetch(
-        `https://${shop}/admin/api/2024-01/recurring_application_charges/${chargeId}/activate.json`,
-        {
-          method: 'POST',
-          headers: {
-            'X-Shopify-Access-Token': store.access_token,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            recurring_application_charge: {
-              id: chargeId,
-            },
-          }),
-        }
-      );
-
-      if (!activateResponse.ok) {
-        console.error('❌ Failed to activate charge');
-        return NextResponse.redirect(buildShopifyAdminUrl(shop, { error: 'billing_activation_failed' }));
-      }
-
-      console.log('✅ Billing charge activated');
-    } else if (charge.status === 'active') {
-      // Test charges are already active, no need to activate
-      console.log('✅ Billing charge already active (test mode)');
-    } else if (charge.status === 'declined') {
-      console.log('❌ Merchant declined billing');
-
-      // Update store status to trial/free
+      // Update store status to declined
       await supabase
         .from('stores')
         .update({
@@ -114,13 +120,12 @@ export async function GET(request: NextRequest) {
         .eq('id', storeId);
 
       return NextResponse.redirect(buildShopifyAdminUrl(shop, { billing: 'declined' }));
-    } else {
-      // Pending or other status
-      return NextResponse.redirect(buildShopifyAdminUrl(shop, { billing: 'pending' }));
     }
 
-    // Update store with billing info (for both accepted and active statuses)
-    if (charge.status === 'accepted' || charge.status === 'active') {
+    console.log('Active subscription found:', activeSubscription.status, activeSubscription.name);
+
+    if (activeSubscription.status === 'ACTIVE') {
+      // Update store with billing info
       await supabase
         .from('stores')
         .update({
@@ -139,7 +144,7 @@ export async function GET(request: NextRequest) {
         })
         .eq('id', store.merchant_id);
 
-      console.log('✅ Database updated with billing info');
+      console.log('Database updated with billing info');
 
       // Get merchant info
       const { data: merchant } = await supabase
@@ -149,40 +154,38 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (merchant) {
-        // For embedded apps, construct the proper Shopify admin URL
-        const shopName = shop!.replace('.myshopify.com', '');
-        const apiKey = process.env.SHOPIFY_API_KEY || 'ebcd49739472f025754a6afcc20bf66d';
-        const shopifyAdminUrl = `https://admin.shopify.com/store/${shopName}/apps/${apiKey}`;
+        const shopifyAdminUrl = buildShopifyAdminUrl(shop);
 
-        console.log('🔄 Redirecting to:', shopifyAdminUrl);
-        console.log('📍 Shop:', shop);
-        console.log('📍 Shop name:', shopName);
+        console.log('Redirecting to:', shopifyAdminUrl);
 
         const response = NextResponse.redirect(shopifyAdminUrl);
 
         // Store merchant_id and shop in cookies for easy access
         response.cookies.set('merchant_id', merchant.id, {
-          httpOnly: false, // Allow client-side access
+          httpOnly: false,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'lax',
           maxAge: 60 * 60 * 24 * 30, // 30 days
           path: '/',
         });
 
-        response.cookies.set('shop_domain', shop!, {
-          httpOnly: false, // Allow client-side access
+        response.cookies.set('shop_domain', shop, {
+          httpOnly: false,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'lax',
           maxAge: 60 * 60 * 24 * 30, // 30 days
           path: '/',
         });
 
-        console.log('✅ Redirecting to dashboard with billing success');
+        console.log('Redirecting to dashboard with billing success');
         return response;
       }
 
       return NextResponse.redirect(buildShopifyAdminUrl(shop, { billing: 'success' }));
     }
+
+    // Non-active status (pending, etc.)
+    return NextResponse.redirect(buildShopifyAdminUrl(shop, { billing: 'pending' }));
   } catch (error) {
     console.error('Billing callback error:', error);
     const shop = request.nextUrl.searchParams.get('shop');

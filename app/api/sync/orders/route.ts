@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { syncStoreOrders } from '@/lib/sync-orders';
+import { getAuthenticatedShop } from '@/lib/verify-session';
 
 /**
  * Sync Orders from All Connected Channels
@@ -7,6 +8,11 @@ import { syncStoreOrders } from '@/lib/sync-orders';
  */
 export async function POST(request: NextRequest) {
   try {
+    const shop = getAuthenticatedShop(request);
+    if (!shop) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     // Accept both storeId (from dashboard) and store_id (from cron)
     const store_id = body.storeId || body.store_id;

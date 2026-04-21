@@ -1,17 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
+import { getAuthenticatedShop } from '@/lib/verify-session';
 
 /**
  * Generate AI insights for a store's campaigns using Claude
  */
 export async function POST(request: NextRequest) {
-  console.log('🤖 [AI Insights] Starting generation...');
+  console.log('[AI Insights] Starting generation...');
 
   try {
+    const shop = getAuthenticatedShop(request);
+    if (!shop) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { storeId } = body;
-    console.log('🤖 [AI Insights] Store ID:', storeId);
+    console.log('[AI Insights] Store ID:', storeId);
 
     if (!storeId) {
       return NextResponse.json({ error: 'Store ID required' }, { status: 400 });

@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Visit: https://syncflow.ca/api/billing/test?shop=argora-test.myshopify.com
-// This will create a billing charge and redirect you to approve it
+// Test endpoint for billing charge creation
+// Requires CRON_SECRET auth: Authorization: Bearer <CRON_SECRET>
 
 export async function GET(request: NextRequest) {
+  // Require CRON_SECRET for access
+  const authHeader = request.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const shop = request.nextUrl.searchParams.get('shop');
 
   if (!shop) {
@@ -14,7 +21,7 @@ export async function GET(request: NextRequest) {
     }, { status: 400 });
   }
 
-  console.log('🧪 [BILLING TEST] Starting for shop:', shop);
+  console.log('[BILLING TEST] Starting for shop:', shop);
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -29,38 +36,38 @@ export async function GET(request: NextRequest) {
     .single();
 
   if (storeError || !store) {
-    console.log('❌ [BILLING TEST] Store not found:', storeError);
+    console.log('[BILLING TEST] Store not found:', storeError);
     return NextResponse.json({ error: 'Store not found', shop }, { status: 404 });
   }
 
   if (!store.access_token) {
-    console.log('❌ [BILLING TEST] No access token for store');
+    console.log('[BILLING TEST] No access token for store');
     return NextResponse.json({ error: 'No access token - app needs to be reinstalled properly' }, { status: 400 });
   }
 
-  console.log('✅ [BILLING TEST] Found store with access token');
-  console.log('🔍 [BILLING TEST] Token preview:', store.access_token ? (store.access_token.substring(0, 10) + '...') : 'EMPTY');
-  console.log('🔍 [BILLING TEST] Store ID:', store.id);
-  console.log('🔍 [BILLING TEST] Updated at:', store.updated_at);
+  console.log('[BILLING TEST] Found store with access token');
 
   const accessToken = store.access_token;
   const isTestCharge = shop.includes('-test') || shop.includes('development');
   const shopName = shop.replace('.myshopify.com', '');
-  const clientId = '08fa8bc27e0e3ac857912c7e7ee289d0';
-  const returnUrl = `https://admin.shopify.com/store/${shopName}/apps/${clientId}`;
+  const apiKey = process.env.SHOPIFY_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json({ error: 'SHOPIFY_API_KEY not configured' }, { status: 500 });
+  }
+  const returnUrl = `https://admin.shopify.com/store/${shopName}/apps/${apiKey}`;
 
   // Check for existing charges first
-  console.log('🔍 [BILLING TEST] Checking existing charges...');
+  console.log('[BILLING TEST] Checking existing charges...');
   const existingResponse = await fetch(
     `https://${shop}/admin/api/2024-01/recurring_application_charges.json`,
     { headers: { 'X-Shopify-Access-Token': accessToken } }
   );
 
-  console.log('🔍 [BILLING TEST] Existing charges response:', existingResponse.status);
+  console.log('[BILLING TEST] Existing charges response:', existingResponse.status);
 
   if (!existingResponse.ok) {
     const errorText = await existingResponse.text();
-    console.log('❌ [BILLING TEST] Failed to get existing charges:', existingResponse.status, errorText);
+    console.log('[BILLING TEST] Failed to get existing charges:', existingResponse.status, errorText);
     return NextResponse.json({
       error: 'Failed to get existing charges',
       status: existingResponse.status,
@@ -72,7 +79,7 @@ export async function GET(request: NextRequest) {
     const existing = await existingResponse.json();
     const pending = existing.recurring_application_charges?.find((c: any) => c.status === 'pending');
     if (pending) {
-      console.log('✅ [BILLING TEST] Found pending charge, redirecting');
+      console.log('[BILLING TEST] Found pending charge, redirecting');
       return NextResponse.redirect(pending.confirmation_url);
     }
 
@@ -87,7 +94,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Create new charge
-  console.log('🧪 [BILLING TEST] Creating new charge...');
+  console.log('[BILLING TEST] Creating new charge...');
   const chargeResponse = await fetch(
     `https://${shop}/admin/api/2024-01/recurring_application_charges.json`,
     {
@@ -110,9 +117,7 @@ export async function GET(request: NextRequest) {
 
   if (!chargeResponse.ok) {
     const errorText = await chargeResponse.text();
-    console.log('❌ [BILLING TEST] Failed:', chargeResponse.status);
-    console.log('❌ [BILLING TEST] Response headers:', Object.fromEntries(chargeResponse.headers.entries()));
-    console.log('❌ [BILLING TEST] Response body:', errorText);
+    console.log('[BILLING TEST] Failed:', chargeResponse.status);
 
     let errorJson = {};
     try {
@@ -132,7 +137,7 @@ export async function GET(request: NextRequest) {
   const chargeData = await chargeResponse.json();
   const confirmationUrl = chargeData.recurring_application_charge.confirmation_url;
 
-  console.log('✅ [BILLING TEST] Charge created, redirecting to:', confirmationUrl);
+  console.log('[BILLING TEST] Charge created, redirecting to:', confirmationUrl);
 
   return NextResponse.redirect(confirmationUrl);
 }

@@ -3,8 +3,16 @@ import { createClient } from '@supabase/supabase-js';
 
 /**
  * Debug endpoint to test Shopify API connection
+ * Requires CRON_SECRET auth: Authorization: Bearer <CRON_SECRET>
  */
 export async function GET(request: NextRequest) {
+  // Require CRON_SECRET for access
+  const authHeader = request.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const storeId = request.nextUrl.searchParams.get('store_id');
 
@@ -47,7 +55,6 @@ export async function GET(request: NextRequest) {
     });
 
     const responseStatus = response.status;
-    const responseHeaders = Object.fromEntries(response.headers.entries());
 
     let responseBody;
     try {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthenticatedShop } from '@/lib/verify-session';
 
 /**
  * Update Store Settings
@@ -7,6 +8,11 @@ import { createClient } from '@supabase/supabase-js';
  */
 export async function PATCH(request: NextRequest) {
   try {
+    const shop = getAuthenticatedShop(request);
+    if (!shop) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { store_id, sync_frequency, email_report_frequency } = await request.json();
 
     if (!store_id) {

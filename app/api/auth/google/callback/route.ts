@@ -29,16 +29,19 @@ export async function GET(request: NextRequest) {
     console.log('✅ Token exchange successful, access token length:', tokens.accessToken.length);
 
     // WORKAROUND: Skip listAccessibleCustomers due to 501 error
-    // Use hardcoded Manager Account ID for now
-    const managerAccountId = process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || '7167233993';
-    console.log('📊 Using Manager Account ID directly:', managerAccountId);
+    // Use Manager Account ID from environment variable
+    const managerAccountId = process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID;
+    if (!managerAccountId) {
+      console.error('GOOGLE_ADS_LOGIN_CUSTOMER_ID not set');
+      return returnHtmlResponse(false, 'Google Ads Manager Account ID not configured. Set GOOGLE_ADS_LOGIN_CUSTOMER_ID env var.');
+    }
+    console.log('Using Manager Account ID from env:', managerAccountId);
 
-    // Create customer object with hardcoded values
     const customers = [{
       customerId: managerAccountId,
-      descriptiveName: 'Adwyse Manager Account',
+      descriptiveName: 'Manager Account',
     }];
-    console.log('📊 Using hardcoded customer:', customers[0]);
+    console.log('Using customer:', customers[0]);
 
     // Save to database
     const supabase = createClient(

@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthenticatedShop } from '@/lib/verify-session';
 
 /**
  * Analytics Summary
  * Returns revenue and profit metrics by channel
  */
 export async function GET(request: NextRequest) {
+  const shop = getAuthenticatedShop(request);
+  if (!shop) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const storeId = request.nextUrl.searchParams.get('store_id');
   const days = parseInt(request.nextUrl.searchParams.get('days') || '30');
 

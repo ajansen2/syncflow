@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthenticatedShop } from '@/lib/verify-session';
 
 // API endpoint to auto-create merchant and store for embedded Shopify apps
 // This is called when a Shopify app is installed but records don't exist yet
 export async function POST(request: NextRequest) {
   try {
+    // Allow unsigned during install flow
+    const authenticatedShop = getAuthenticatedShop(request, true);
     const { shop } = await request.json();
+    const resolvedShop = authenticatedShop || shop;
 
-    if (!shop) {
+    if (!resolvedShop) {
       return NextResponse.json({ error: 'Missing shop parameter' }, { status: 400 });
     }
 
@@ -24,7 +28,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Extract shop name from URL for email
-    const shopName = shop.replace('.myshopify.com', '');
+    const shopName = resolvedShop.replace('.myshopify.com', '');
     const email = `${shopName}@shopify-placeholder.com`;
 
     // Create merchant record
@@ -53,7 +57,7 @@ export async function POST(request: NextRequest) {
       .insert({
         merchant_id: merchantData.id,
         store_name: shopName,
-        store_url: `https://${shop}`,
+        store_url: `https://${resolvedShop}`,
         platform: 'shopify',
         status: 'active',
         created_at: new Date().toISOString()

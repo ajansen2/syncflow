@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getAuthenticatedShop } from '@/lib/verify-session';
 
 /**
  * Get email report settings for a store
  */
 export async function GET(request: NextRequest) {
   try {
+    const shop = getAuthenticatedShop(request);
+    if (!shop) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const storeId = request.nextUrl.searchParams.get('store_id');
 
     if (!storeId) {
@@ -41,6 +47,11 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const shop = getAuthenticatedShop(request);
+    if (!shop) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { storeId, frequency } = body;
 

@@ -26,7 +26,7 @@ interface ReportData {
  */
 export function generateReportEmail(data: ReportData): string {
   const shopName = data.shopDomain?.replace('.myshopify.com', '') || '';
-  const appId = process.env.SHOPIFY_API_KEY || 'ebcd49739472f025754a6afcc20bf66d';
+  const appId = process.env.SHOPIFY_API_KEY || '';
   const dashboardUrl = shopName
     ? `https://admin.shopify.com/store/${shopName}/apps/${appId}`
     : 'https://syncflow-blush.vercel.app/dashboard';

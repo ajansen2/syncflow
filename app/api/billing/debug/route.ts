@@ -2,9 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 // Debug endpoint to check what's in the database
-// Visit: https://syncflow.ca/api/billing/debug?shop=argora-test.myshopify.com
+// Requires CRON_SECRET auth: Authorization: Bearer <CRON_SECRET>
 
 export async function GET(request: NextRequest) {
+  // Require CRON_SECRET for access
+  const authHeader = request.headers.get('authorization');
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const shop = request.nextUrl.searchParams.get('shop');
 
   if (!shop) {
